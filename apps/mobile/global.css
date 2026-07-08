@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sophia-bg: #07080F;
+  --color-sophia-bg2: #0E1020;
+  --color-sophia-bg3: #141629;
+  --color-sophia-card: #181B30;
+  --color-sophia-card2: #1E2240;
+  --color-sophia-border: #252A45;
+  --color-sophia-border2: #2E3560;
+  --color-sophia-primary: #5B6EF5;
+  --color-sophia-primary2: #7B8EFF;
+  --color-sophia-accent: #00C9A7;
+  --color-sophia-accent2: #F5A623;
+  --color-sophia-danger: #F55B7A;
+  --color-sophia-text: #E8EAF6;
+  --color-sophia-text2: #9BA3CC;
+  --color-sophia-text3: #5A6494;
+
+  --font-head: "Syne", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-sophia-bg text-sophia-text font-body;
+  }
+}
+
+.font-head {
+  font-family: var(--font-head);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}

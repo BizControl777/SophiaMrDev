@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id               String          @id @default(uuid())
+  name             String
+  email            String          @unique
+  password         String          // Adicionado para autenticação
+  role             String          @default("STUDENT")
+  status           String          @default("ACTIVE")
+  balance          Float           @default(0.00)
+  reputation       Int             @default(0)
+  avatar           String?
+  chosenSubjects   String?         // Armazena as disciplinas escolhidas no cadastro (ex: JSON ou CSV)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  lessonsAsTeacher LessonRequest[] @relation("TeacherLessons")
+  lessonsAsStudent LessonRequest[] @relation("StudentLessons")
+  createdLessons   Lesson[]        @relation("TeacherCreatedLessons")
+  simulations      Simulation[]
+  teacherProfile   TeacherProfile?
+  chats            Chat[]
+  createdDuels     Duel[]          @relation("CreatedDuels")
+  participatedDuels Duel[]         @relation("ParticipatedDuels")
+  achievements     UserAchievement[]
+}
+
+model Lesson {
+  id          String   @id @default(uuid())
+  teacherId   String
+  title       String
+  subject     String
+  description String
+  objectives  String   // Armazenado como JSON string
+  materials   String   // Armazenado como JSON string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  teacher     User     @relation("TeacherCreatedLessons", fields: [teacherId], references: [id])
+}
+
+model TeacherProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  subject        String
+  bio            String
+  experience     String
+  pricePerLesson Float
+  institution    String   @default("UEM")
+  specialties    String
+  rating         Float    @default(5.0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
+}
+
+model LessonRequest {
+  id          String         @id @default(uuid())
+  studentId   String
+  teacherId   String
+  subject     String
+  description String?
+  price       Float
+  status      String         @default("PENDING")
+  date        DateTime       @default(now())
+  materials   String? // Novo: Materiais anexados pelo professor no aceite
+  chatMessages String? // Novo: Mensagens trocadas entre aluno e professor (JSON array)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  teacher     User           @relation("TeacherLessons", fields: [teacherId], references: [id])
+  student     User           @relation("StudentLessons", fields: [studentId], references: [id])
+  review      LessonReview?
+}
+
+model LessonReview {
+  id              String        @id @default(uuid())
+  lessonRequestId String        @unique
+  studentId       String
+  teacherId       String
+  rating          Int           @default(5)
+  comment         String?
+  createdAt       DateTime      @default(now())
+  lessonRequest   LessonRequest @relation(fields: [lessonRequestId], references: [id])
+}
+
+model Exam {
+  id          String     @id
+  title       String
+  institution String
+  year        Int
+  subject     String
+  isOld       Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  questions   Question[]
+}
+
+model Question {
+  id            String   @id @default(uuid())
+  examId        String?
+  text          String
+  options       String
+  correctAnswer Int
+  explanation   String?
+  subject       String
+  topic         String?
+  difficulty    String   @default("médio")
+  university    String
+  year          Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  exam          Exam?    @relation(fields: [examId], references: [id])
+}
+
+model Simulation {
+  id             String   @id @default(uuid())
+  userId         String
+  title          String
+  subject        String
+  score          Int
+  totalQuestions Int
+  timeSpent      Int
+  results        String
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
+}
+
+model Chat {
+  id        String    @id @default(uuid())
+  userId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  chatId    String
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+  chat      Chat     @relation(fields: [chatId], references: [id])
+}
+
+model Duel {
+  id            String    @id @default(uuid())
+  creatorId     String
+  opponentId    String
+  status        String    @default("PENDING") // PENDING, ACCEPTED, DECLINED, FINISHED, EXPIRED
+  subject       String
+  questions     String    // Armazenado como JSON string (as 5 perguntas)
+  creatorScore  Int?
+  opponentScore Int?
+  betAmount     Float     @default(0.00) // Valor apostado por cada participante
+  scheduledAt   DateTime? // Horário agendado para o duelo
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  creator       User      @relation("CreatedDuels", fields: [creatorId], references: [id])
+  opponent      User      @relation("ParticipatedDuels", fields: [opponentId], references: [id])
+}
+
+model Achievement {
+  id          String            @id @default(uuid())
+  name        String            @unique
+  description String
+  icon        String            // Ex: "🔥", "🏆"
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  userId        String
+  achievementId String
+  unlockedAt    DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id])
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@id([userId, achievementId])
+}

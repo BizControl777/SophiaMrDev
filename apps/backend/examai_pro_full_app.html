@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080F;--bg2:#0E1020;--bg3:#141629;--card:#181B30;--card2:#1E2240;
+  --border:#252A45;--border2:#2E3560;
+  --primary:#5B6EF5;--primary2:#7B8EFF;--accent:#00C9A7;--accent2:#F5A623;--danger:#F55B7A;
+  --text:#E8EAF6;--text2:#9BA3CC;--text3:#5A6494;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:600px;overflow:hidden}
+.app{display:flex;height:600px;width:100%}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.logo{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-text{font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text)}
+.logo-sub{font-size:10px;color:var(--text3);font-weight:400}
+.nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-section{font-size:10px;color:var(--text3);font-weight:600;padding:10px 10px 4px;letter-spacing:.08em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;position:relative}
+.nav-item:hover{background:var(--card);color:var(--text)}
+.nav-item.active{background:rgba(91,110,245,.18);color:var(--primary2)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--primary);border-radius:0 2px 2px 0}
+.nav-icon{font-size:16px;width:20px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--primary);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
+.sidebar-user{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5B6EF5,#00C9A7);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:var(--text3)}
+.user-dots{color:var(--text3);cursor:pointer;font-size:14px}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.topbar-title{font-family:var(--font-head);font-size:16px;font-weight:700;flex:1}
+.topbar-search{background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;padding:0 12px;gap:8px;height:32px}
+.topbar-search input{background:none;border:none;outline:none;font-size:12px;color:var(--text);font-family:var(--font-body);width:160px}
+.topbar-search input::placeholder{color:var(--text3)}
+.topbar-btn{width:32px;height:32px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--text2);position:relative}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--danger);border-radius:50%}
+.content{flex:1;overflow-y:auto;padding:20px}
+.page{display:none}
+.page.active{display:block}
+
+/* AUTH PAGES */
+.auth-wrap{min-height:548px;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:360px}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;justify-content:center}
+.auth-logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.auth-logo-text{font-family:var(--font-head);font-size:20px;font-weight:800}
+.auth-title{font-family:var(--font-head);font-size:22px;font-weight:700;margin-bottom:4px}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:6px;display:block}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;transition:border .15s}
+.form-input:focus{border-color:var(--primary)}
+.btn-primary{width:100%;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;font-family:var(--font-body);cursor:pointer;transition:all .15s;margin-top:4px}
+.btn-primary:hover{background:var(--primary2)}
+.auth-divider{text-align:center;font-size:12px;color:var(--text3);margin:16px 0;position:relative}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border)}
+.auth-divider::before{left:0}.auth-divider::after{right:0}
+.btn-google{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px;font-size:13px;font-weight:500;font-family:var(--font-body);cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.btn-google:hover{border-color:var(--border2)}
+.auth-link{text-align:center;font-size:12px;color:var(--text2);margin-top:18px}
+.auth-link a{color:var(--primary2);cursor:pointer;text-decoration:none;font-weight:500}
+
+/* DASHBOARD */
+.page-header{margin-bottom:20px}
+.page-header h1{font-family:var(--font-head);font-size:22px;font-weight:700}
+.page-header p{font-size:13px;color:var(--text2);margin-top:3px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.stat-card.blue::before{background:var(--primary)}
+.stat-card.green::before{background:var(--accent)}
+.stat-card.amber::before{background:var(--accent2)}
+.stat-card.red::before{background:var(--danger)}
+.stat-icon{font-size:22px;margin-bottom:8px}
+.stat-val{font-family:var(--font-head);font-size:24px;font-weight:800;line-height:1}
+.stat-label{font-size:11px;color:var(--text2);margin-top:4px}
+.stat-change{font-size:11px;margin-top:6px}
+.stat-change.up{color:var(--accent)}.stat-change.down{color:var(--danger)}
+.dashboard-grid{display:grid;grid-template-columns:1fr 280px;gap:16px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.chart-title{font-family:var(--font-head);font-size:14px;font-weight:700}
+.chart-tabs{display:flex;gap:4px}
+.chart-tab{font-size:11px;padding:3px 10px;border-radius:6px;cursor:pointer;color:var(--text2);border:1px solid transparent}
+.chart-tab.active{background:rgba(91,110,245,.2);color:var(--primary2);border-color:rgba(91,110,245,.3)}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:100px}
+.bar-group{flex:1;display:flex;align-items:flex-end;gap:3px}
+.bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:height .3s}
+.bar.b1{background:var(--primary)}.bar.b2{background:var(--accent)}
+.bar-labels{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.bar-label{flex:1;text-align:center;font-size:10px;color:var(--text3)}
+.side-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.side-title{font-family:var(--font-head);font-size:13px;font-weight:700;margin-bottom:14px}
+.activity-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.activity-text{flex:1;font-size:12px;color:var(--text2);line-height:1.4}
+.activity-time{font-size:10px;color:var(--text3)}
+.progress-item{margin-bottom:12px}
+.progress-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.progress-label{color:var(--text2)}.progress-val{color:var(--text);font-weight:500}
+.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s}
+
+/* TUTOR */
+.tutor-wrap{display:flex;height:508px;gap:0}
+.chat-sidebar{width:200px;background:var(--card);border-right:1px solid var(--border);border-radius:12px 0 0 12px;padding:12px;flex-shrink:0}
+.chat-sidebar-title{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.chat-session{padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--text2);margin-bottom:3px;border:1px solid transparent}
+.chat-session:hover,.chat-session.active{background:var(--bg3);border-color:var(--border);color:var(--text)}
+.chat-session-title{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-session-time{font-size:10px;color:var(--text3);margin-top:2px}
+.new-chat-btn{width:100%;background:rgba(91,110,245,.15);border:1px solid rgba(91,110,245,.3);border-radius:8px;color:var(--primary2);padding:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);margin-bottom:12px}
+.chat-main{flex:1;display:flex;flex-direction:column;background:var(--bg3);border-radius:0 12px 12px 0;overflow:hidden;border:1px solid var(--border);border-left:none}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:10px;max-width:85%}
+.msg.user{flex-direction:row-reverse;align-self:flex-end}
+.msg-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.msg.ai .msg-avatar{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff}
+.msg.user .msg-avatar{background:var(--accent2);color:var(--bg)}
+.msg-bubble{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;color:var(--text)}
+.msg.user .msg-bubble{background:rgba(91,110,245,.2);border-color:rgba(91,110,245,.4)}
+.msg-time{font-size:10px;color:var(--text3);margin-top:4px;padding:0 2px}
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:4px 0}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--primary2);animation:pulse 1.2s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1);opacity:1}}
+.chat-input-area{padding:12px 16px;border-top:1px solid var(--border);background:var(--card2)}
+.chat-input-row{display:flex;gap:8px;align-items:flex-end}
+.chat-textarea{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font-body);resize:none;outline:none;max-height:80px;transition:border .15s;line-height:1.4}
+.chat-textarea:focus{border-color:var(--primary)}
+.chat-send{width:36px;height:36px;background:var(--primary);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0;transition:all .15s}
+.chat-send:hover{background:var(--primary2)}
+.chat-actions{display:flex;gap:6px;margin-bottom:8px}
+.chat-action-btn{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:var(--font-body)}
+.chat-action-btn:hover{border-color:var(--border2);color:var(--text)}
+
+/* EXAMS */
+.exam-steps{display:flex;gap:0;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.exam-step{flex:1;padding:12px;text-align:center;font-size:12px;color:var(--text3);cursor:pointer;border-right:1px solid var(--border);position:relative}
+.exam-step:last-child{border-right:none}
+.exam-step.active{background:rgba(91,110,245,.15);color:var(--primary2)}
+.exam-step.done{color:var(--accent)}
+.exam-step-num{display:block;font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:2px}
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;cursor:pointer}
+.diff-btns{display:flex;gap:6px}
+.diff-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px;font-size:12px;color:var(--text2);cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font-body)}
+.diff-btn.easy.active{background:rgba(0,201,167,.15);border-color:var(--accent);color:var(--accent)}
+.diff-btn.med.active{background:rgba(245,166,35,.15);border-color:var(--accent2);color:var(--accent2)}
+.diff-btn.hard.active{background:rgba(245,91,122,.15);border-color:var(--danger);color:var(--danger)}
+.exam-header{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:16px}
+.exam-timer{font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--danger)}
+.exam-progress-text{flex:1;font-size:13px;color:var(--text2)}
+.exam-q-num{font-weight:700;color:var(--text)}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px}
+.q-badge{display:inline-block;background:rgba(91,110,245,.2);color:var(--primary2);font-size:11px;padding:3px 10px;border-radius:20px;margin-bottom:10px}
+.q-text{font-size:14px;line-height:1.6;margin-bottom:14px;color:var(--text)}
+.q-options{display:flex;flex-direction:column;gap:8px}
+.q-option{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;font-size:13px}
+.q-option:hover{border-color:var(--border2)}
+.q-option.selected{background:rgba(91,110,245,.15);border-color:var(--primary)}
+.q-option.correct{background:rgba(0,201,167,.12);border-color:var(--accent);color:var(--accent)}
+.q-option.wrong{background:rgba(245,91,122,.12);border-color:var(--danger);color:var(--danger)}
+.opt-letter{width:22px;height:22px;border-radius:6px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.result-header{text-align:center;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px}
+.result-score{font-family:var(--font-head);font-size:52px;font-weight:800}
+.result-score.good{color:var(--accent)}.result-score.ok{color:var(--accent2)}.result-score.bad{color:var(--danger)}
+.result-sub{font-size:13px;color:var(--text2);margin-top:6px}
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.result-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.result-stat-val{font-family:var(--font-head);font-size:20px;font-weight:700}
+.result-stat-label{font-size:11px;color:var(--text2);margin-top:3px}
+
+/* COMPETITIONS */
+.comp-tabs{display:flex;gap:6px;margin-bottom:18px}
+.comp-tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);border:1px solid var(--border)}
+.comp-tab.active{background:rgba(91,110,245,.2);color:var(--primary2);border-color:rgba(91,110,245,.4)}
+.duel-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.duel-card.active-duel{border-color:rgba(91,110,245,.5)}
+.duel-players{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.duel-player{flex:1;display:flex;align-items:center;gap:8px}
+.duel-player.right{flex-direction:row-reverse}
+.duel-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.duel-name{font-size:13px;font-weight:600}
+.duel-score-big{font-family:var(--font-head);font-size:22px;font-weight:800}
+.vs-badge{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;color:var(--text2)}
+.duel-meta{display:flex;gap:8px;font-size:11px;color:var(--text3);margin-bottom:10px}
+.duel-actions{display:flex;gap:8px}
+.btn-sm{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);border:none}
+.btn-sm.primary{background:var(--primary);color:#fff}.btn-sm.primary:hover{background:var(--primary2)}
+.btn-sm.ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}.btn-sm.ghost:hover{border-color:var(--border2);color:var(--text)}
+.btn-sm.danger{background:rgba(245,91,122,.15);color:var(--danger);border:1px solid rgba(245,91,122,.3)}
+.rank-table{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.rank-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.rank-row:last-child{border-bottom:none}
+.rank-row.me{background:rgba(91,110,245,.08)}
+.rank-pos{font-family:var(--font-head);font-size:16px;font-weight:800;width:32px;text-align:center}
+.rank-pos.gold{color:#F5C518}.rank-pos.silver{color:#A8A8A8}.rank-pos.bronze{color:#CD7F32}
+.rank-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.rank-name{flex:1;font-size:13px;font-weight:500}
+.rank-sub{font-size:11px;color:var(--text3)}
+.rank-pts{font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--primary2)}
+.rank-badge{font-size:10px;background:rgba(0,201,167,.15);color:var(--accent);padding:2px 7px;border-radius:10px}
+
+/* ADMIN */
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.admin-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.admin-card-title{font-family:var(--font-head);font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.table-wrap{overflow-x:auto}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{text-align:left;padding:8px 12px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border)}
+.data-table td{padding:9px 12px;border-bottom:1px solid rgba(37,42,69,.5);color:var(--text2)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg3)}
+.td-name{color:var(--text);font-weight:500}
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
+.badge.active{background:rgba(0,201,167,.15);color:var(--accent)}
+.badge.inactive{background:rgba(90,100,148,.15);color:var(--text3)}
+.mini-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;width:60px;display:inline-block;vertical-align:middle}
+.mini-fill{height:100%;border-radius:2px;background:var(--primary)}
+
+/* PROFILE */
+.profile-header{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;display:flex;align-items:center;gap:20px}
+.profile-av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:28px;font-weight:800;color:#fff;flex-shrink:0}
+.profile-name{font-family:var(--font-head);font-size:22px;font-weight:800}
+.profile-email{font-size:13px;color:var(--text2);margin-top:2px}
+.profile-stats{display:flex;gap:24px;margin-top:12px}
+.profile-stat{text-align:center}
+.profile-stat-val{font-family:var(--font-head);font-size:18px;font-weight:700}
+.profile-stat-label{font-size:11px;color:var(--text3)}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.achievements-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.achievement{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center}
+.achievement-icon{font-size:24px;margin-bottom:6px}
+.achievement-name{font-size:11px;color:var(--text2);font-weight:500}
+.achievement.locked{opacity:.4}
+
+/* NOTIFICATIONS PANEL */
+.notif-panel{position:absolute;top:52px;right:0;width:300px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;z-index:100;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.notif-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.notif-header-title{font-family:var(--font-head);font-size:14px;font-weight:700}
+.notif-mark{font-size:11px;color:var(--primary2);cursor:pointer}
+.notif-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;cursor:pointer}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:var(--card)}
+.notif-item.unread{background:rgba(91,110,245,.06)}
+.notif-dot2{width:6px;height:6px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:4px}
+.notif-text{font-size:12px;color:var(--text2);line-height:1.5;flex:1}
+.notif-text strong{color:var(--text)}
+.notif-time2{font-size:10px;color:var(--text3);margin-top:3px}
+
+/* EXAM RUNNING */
+.exam-progress-bar{height:4px;background:var(--bg3);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.exam-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:2px;transition:width .3s}
+.exam-nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.q-explanation{background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text2);margin-top:10px;line-height:1.6}
+.q-explanation strong{color:var(--accent)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ANIMATIONS */
+.page.active{animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="app" id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <div class="logo-icon">🎓</div>
+      <div>
+        <div class="logo-text">ExamAI Pro</div>
+        <div class="logo-sub">Plataforma Inteligente</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" data-page="tutor">
+        <span class="nav-icon">🤖</span> Tutor IA
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" data-page="exams">
+        <span class="nav-icon">📝</span> Exames
+      </div>
+      <div class="nav-section">Competição</div>
+      <div class="nav-item" data-page="competitions">
+        <span class="nav-icon">⚔️</span> Competições
+        <span class="nav-badge">2</span>
+      </div>
+      <div class="nav-item" data-page="rankings">
+        <span class="nav-icon">🏆</span> Rankings
+      </div>
+      <div class="nav-section">Gestão</div>
+      <div class="nav-item" data-page="admin">
+        <span class="nav-icon">🏫</span> Administração
+      </div>
+      <div class="nav-item" data-page="profile">
+        <span class="nav-icon">👤</span> Perfil
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="avatar">AK</div>
+      <div class="user-info">
+        <div class="user-name">António Kumbe</div>
+        <div class="user-role">Estudante · Pro</div>
+      </div>
+      <div class="user-dots" onclick="showPage('profile')">⋯</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main-area">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-search">
+        <span style="color:var(--text3);font-size:13px">🔍</span>
+        <input type="text" placeholder="Pesquisar disciplinas, temas...">
+      </div>
+      <div class="topbar-btn" onclick="toggleNotif()">
+        🔔
+        <div class="notif-dot"></div>
+      </div>
+      <div class="topbar-btn" onclick="showPage('profile')">⚙️</div>
+
+      <!-- NOTIFICATION PANEL -->
+      <div class="notif-panel" id="notif-panel" style="display:none">
+        <div class="notif-header">
+          <div class="notif-header-title">Notificações</div>
+          <div class="notif-mark">Marcar todas lidas</div>
+        </div>
+        <div class="notif-item unread">
+          <div class="notif-dot2"></div>
+          <div>
+            <div class="notif-text"><strong>Duelo aceite!</strong> Carlos Silva aceitou o seu desafio em Matemática</div>
+            <div class="notif-time2">há 5 min</div>
+          </div>
+        </div>
+        <div class="notif-item unread">
+          <div class="notif-dot2"></div>
+          <div>
+            <div class="notif-text"><strong>Novo ranking!</strong> Subiu para #12 em Física</div>
+            <div class="notif-time2">há 1h</div>
+          </div>
+        </div>
+        <div class="notif-item">
+          <div style="width:6px;flex-shrink:0"></div>
+          <div>
+            <div class="notif-text">Exame de <strong>Química</strong> disponível — Sem prazo definido</div>
+            <div class="notif-time2">ontem</div>
+          </div>
+        </div>
+        <div class="notif-item">
+          <div style="width:6px;flex-shrink:0"></div>
+          <div>
+            <div class="notif-text">O professor criou uma nova <strong>competição de turma</strong></div>
+            <div class="notif-time2">há 2 dias</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== PAGE: DASHBOARD ===== -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Bom dia, António 👋</h1>
+          <p>Aqui está o resumo do seu desempenho</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon">📈</div>
+            <div class="stat-val">87%</div>
+            <div class="stat-label">Média geral</div>
+            <div class="stat-change up">↑ 4% esta semana</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">📝</div>
+            <div class="stat-val">34</div>
+            <div class="stat-label">Exames feitos</div>
+            <div class="stat-change up">↑ 6 esta semana</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-val">#12</div>
+            <div class="stat-label">Posição global</div>
+            <div class="stat-change up">↑ 3 posições</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon">⚔️</div>
+            <div class="stat-val">8/11</div>
+            <div class="stat-label">Duelos ganhos</div>
+            <div class="stat-change down">73% vitórias</div>
+          </div>
+        </div>
+        <div class="dashboard-grid">
+          <div>
+            <div class="chart-card" style="margin-bottom:14px">
+              <div class="chart-header">
+                <div class="chart-title">Desempenho por Disciplina</div>
+                <div class="chart-tabs">
+                  <div class="chart-tab active">Semana</div>
+                  <div class="chart-tab">Mês</div>
+                </div>
+              </div>
+              <div class="bar-chart" id="bar-chart">
+                <div class="bar-group"><div class="bar b1" style="height:72px"></div><div class="bar b2" style="height:80px"></div></div>
+                <div class="bar-group"><div class="bar b1" style="height:85px"></div><div class="bar b2" style="height:60px"></div></div>
+                <div class="bar-group"><div class="bar b1" style="height:50px"></div><div class="bar b2" style="height:70px"></div></div>
+                <div class="bar-group"><div class="bar b1" style="height:90px"></div><div class="bar b2" style="height:85px"></div></div>
+                <div class="bar-group"><div class="bar b1" style="height:45px"></div><div class="bar b2" style="height:55px"></div></div>
+                <div class="bar-group"><div class="bar b1" style="height:78px"></div><div class="bar b2" style="height:65px"></div></div>
+              </div>
+              <div class="bar-labels">
+                <div class="bar-label">Mat</div><div class="bar-label">Fís</div><div class="bar-label">Quím</div>
+                <div class="bar-label">Biol</div><div class="bar-label">Hist</div><div class="bar-label">Port</div>
+              </div>
+              <div style="display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--text3)">
+                <span><span style="display:inline-block;width:10px;height:10px;background:var(--primary);border-radius:2px;margin-right:4px;vertical-align:middle"></span>Acertos</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent);border-radius:2px;margin-right:4px;vertical-align:middle"></span>Média turma</span>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title" style="margin-bottom:12px">Progresso por Tema</div>
+              <div class="progress-item">
+                <div class="progress-header"><span class="progress-label">Álgebra Linear</span><span class="progress-val">92%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:92%;background:var(--accent)"></div></div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-header"><span class="progress-label">Mecânica Clássica</span><span class="progress-val">78%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:78%;background:var(--primary)"></div></div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-header"><span class="progress-label">Química Orgânica</span><span class="progress-val">65%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:65%;background:var(--accent2)"></div></div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-header"><span class="progress-label">Genética</span><span class="progress-val">45%</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--danger)"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="side-card">
+            <div class="side-title">Actividade Recente</div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--accent)"></div>
+              <div class="activity-text">Completou exame de <strong>Matemática</strong> — 92%</div>
+              <div class="activity-time">há 2h</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--primary)"></div>
+              <div class="activity-text">Ganhou duelo vs <strong>Maria J.</strong> em Física</div>
+              <div class="activity-time">hoje</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--accent2)"></div>
+              <div class="activity-text">Estudou <strong>Química Org.</strong> com o Tutor IA</div>
+              <div class="activity-time">ontem</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--danger)"></div>
+              <div class="activity-text">Perdeu duelo vs <strong>Tiago M.</strong> em Biologia</div>
+              <div class="activity-time">2 dias</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--accent)"></div>
+              <div class="activity-text">Subiu para <strong>#12</strong> no ranking global</div>
+              <div class="activity-time">3 dias</div>
+            </div>
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+              <div class="side-title">Próximos Eventos</div>
+              <div style="background:rgba(91,110,245,.1);border:1px solid rgba(91,110,245,.25);border-radius:8px;padding:10px 12px;margin-bottom:8px">
+                <div style="font-size:12px;font-weight:600">Competição Semanal</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Matemática Geral · Domingo 20h</div>
+              </div>
+              <div style="background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:8px;padding:10px 12px">
+                <div style="font-size:12px;font-weight:600">Simulado Admissão</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Todas as disciplinas · Sábado 14h</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: TUTOR ===== -->
+      <div class="page" id="page-tutor">
+        <div class="page-header">
+          <h1>🤖 Tutor IA</h1>
+          <p>Seu professor virtual disponível 24/7</p>
+        </div>
+        <div class="tutor-wrap">
+          <div class="chat-sidebar">
+            <button class="new-chat-btn" onclick="newChat()">+ Nova conversa</button>
+            <div class="chat-sidebar-title">Histórico</div>
+            <div class="chat-session active">
+              <div class="chat-session-title">Derivadas e integrais</div>
+              <div class="chat-session-time">hoje</div>
+            </div>
+            <div class="chat-session">
+              <div class="chat-session-title">Lei de Newton</div>
+              <div class="chat-session-time">ontem</div>
+            </div>
+            <div class="chat-session">
+              <div class="chat-session-title">Tabela periódica</div>
+              <div class="chat-session-time">há 3 dias</div>
+            </div>
+            <div class="chat-session">
+              <div class="chat-session-title">Fotossíntese</div>
+              <div class="chat-session-time">há 5 dias</div>
+            </div>
+            <div class="chat-session">
+              <div class="chat-session-title">Revolução Industrial</div>
+              <div class="chat-session-time">há 1 sem</div>
+            </div>
+          </div>
+          <div class="chat-main">
+            <div class="chat-messages" id="chat-messages">
+              <div class="msg ai">
+                <div class="msg-avatar">🤖</div>
+                <div>
+                  <div class="msg-bubble">Olá António! Sou o seu Tutor IA. Estou aqui para ajudá-lo com qualquer dúvida sobre as suas disciplinas. O que gostaria de estudar hoje?</div>
+                  <div class="msg-time">09:00</div>
+                </div>
+              </div>
+              <div class="msg user">
+                <div class="msg-avatar">AK</div>
+                <div>
+                  <div class="msg-bubble">Preciso de ajuda com derivadas. Não estou a perceber quando usar a regra da cadeia.</div>
+                  <div class="msg-time">09:02</div>
+                </div>
+              </div>
+              <div class="msg ai">
+                <div class="msg-avatar">🤖</div>
+                <div>
+                  <div class="msg-bubble">
+                    Boa questão! A <strong>regra da cadeia</strong> é usada quando temos uma função composta, ou seja, uma função dentro de outra.<br><br>
+                    <strong>Fórmula:</strong> Se f(x) = g(h(x)), então f'(x) = g'(h(x)) · h'(x)<br><br>
+                    <strong>Exemplo:</strong> f(x) = (3x² + 1)⁵<br>
+                    Aqui, h(x) = 3x² + 1 e g(u) = u⁵<br>
+                    Então: f'(x) = 5(3x² + 1)⁴ · 6x = 30x(3x² + 1)⁴<br><br>
+                    Quer que eu resolva mais exemplos com você?
+                  </div>
+                  <div class="msg-time">09:02</div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-area">
+              <div class="chat-actions">
+                <button class="chat-action-btn" onclick="sendQuick('Explica com mais detalhes')">💡 Mais detalhes</button>
+                <button class="chat-action-btn" onclick="sendQuick('Dá-me um exercício para praticar')">📝 Exercício</button>
+                <button class="chat-action-btn" onclick="sendQuick('Resume os pontos principais')">📋 Resumo</button>
+              </div>
+              <div class="chat-input-row">
+                <textarea class="chat-textarea" id="chat-input" rows="1" placeholder="Escreva a sua dúvida..." onkeydown="handleKey(event)"></textarea>
+                <button class="chat-send" onclick="sendMessage()">➤</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: EXAMS ===== -->
+      <div class="page" id="page-exams">
+        <div class="page-header">
+          <h1>📝 Exames</h1>
+          <p>Gere e realize exames personalizados</p>
+        </div>
+        <div class="exam-steps">
+          <div class="exam-step active" id="step1-tab"><span class="exam-step-num">1</span>Configurar</div>
+          <div class="exam-step" id="step2-tab"><span class="exam-step-num">2</span>Realizar</div>
+          <div class="exam-step" id="step3-tab"><span class="exam-step-num">3</span>Resultado</div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div id="exam-step1">
+          <div class="chart-card">
+            <div class="chart-title" style="margin-bottom:16px">Configurar Novo Exame</div>
+            <div class="config-grid">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Disciplina</label>
+                <select class="form-select" id="exam-subject">
+                  <option>Matemática</option><option>Física</option><option>Química</option>
+                  <option>Biologia</option><option>História</option><option>Português</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Tema</label>
+                <select class="form-select">
+                  <option>Todos os temas</option><option>Cálculo Diferencial</option>
+                  <option>Álgebra Linear</option><option>Geometria</option><option>Probabilidade</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Número de Questões</label>
+                <select class="form-select" id="exam-nq">
+                  <option>5 questões</option><option>10 questões</option><option selected>15 questões</option><option>20 questões</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Tempo Limite</label>
+                <select class="form-select" id="exam-time">
+                  <option>15 minutos</option><option>30 minutos</option><option selected>45 minutos</option><option>60 minutos</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nível de Dificuldade</label>
+              <div class="diff-btns">
+                <button class="diff-btn easy active" onclick="selectDiff(this,'easy')">🟢 Fácil</button>
+                <button class="diff-btn med" onclick="selectDiff(this,'med')">🟡 Médio</button>
+                <button class="diff-btn hard" onclick="selectDiff(this,'hard')">🔴 Difícil</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <button class="btn-primary" style="flex:1;padding:12px" onclick="startExam()">⚡ Gerar Exame com IA</button>
+              <button class="btn-sm ghost" style="padding:12px 20px" onclick="showPage('exams')">Cancelar</button>
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="chart-title" style="font-family:var(--font-head);font-size:14px;font-weight:700;margin-bottom:12px">Exames Recentes</div>
+            <div class="rank-table">
+              <div class="rank-row"><div style="font-size:12px;color:var(--text2);flex:1"><strong style="color:var(--text)">Matemática — Álgebra</strong> · 15 questões · 45min</div><div style="font-family:var(--font-head);color:var(--accent);font-weight:700">92%</div><div style="font-size:11px;color:var(--text3);margin-left:12px">há 2h</div></div>
+              <div class="rank-row"><div style="font-size:12px;color:var(--text2);flex:1"><strong style="color:var(--text)">Física — Mecânica</strong> · 10 questões · 30min</div><div style="font-family:var(--font-head);color:var(--accent2);font-weight:700">78%</div><div style="font-size:11px;color:var(--text3);margin-left:12px">ontem</div></div>
+              <div class="rank-row"><div style="font-size:12px;color:var(--text2);flex:1"><strong style="color:var(--text)">Química — Orgânica</strong> · 20 questões · 60min</div><div style="font-family:var(--font-head);color:var(--danger);font-weight:700">65%</div><div style="font-size:11px;color:var(--text3);margin-left:12px">há 3 dias</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: RUNNING -->
+        <div id="exam-step2" style="display:none">
+          <div class="exam-header">
+            <div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:2px">Matemática — Álgebra</div>
+              <div class="exam-q-num">Questão <span id="q-current">1</span> de <span id="q-total">3</span></div>
+            </div>
+            <div style="flex:1;margin:0 20px">
+              <div class="exam-progress-bar"><div class="exam-progress-fill" id="exam-fill" style="width:33%"></div></div>
+            </div>
+            <div class="exam-timer" id="exam-timer">44:30</div>
+          </div>
+          <div id="exam-questions"></div>
+          <div class="exam-nav-buttons">
+            <button class="btn-sm ghost" id="btn-prev" onclick="prevQ()" style="display:none">← Anterior</button>
+            <div style="flex:1"></div>
+            <button class="btn-sm primary" id="btn-next" onclick="nextQ()">Próxima →</button>
+            <button class="btn-sm" id="btn-submit" onclick="submitExam()" style="display:none;background:var(--accent);color:var(--bg);border:none;padding:7px 20px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">✓ Submeter</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: RESULTS -->
+        <div id="exam-step3" style="display:none">
+          <div class="result-header">
+            <div class="result-score good" id="result-score">87%</div>
+            <div style="font-family:var(--font-head);font-size:16px;margin-top:6px">Muito Bom! 🎉</div>
+            <div class="result-sub">Completou o exame em 12min 34s · Matemática — Álgebra</div>
+          </div>
+          <div class="result-stats">
+            <div class="result-stat">
+              <div class="result-stat-val" style="color:var(--accent)" id="res-correct">13</div>
+              <div class="result-stat-label">Corretas</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-val" style="color:var(--danger)" id="res-wrong">2</div>
+              <div class="result-stat-label">Erradas</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-val" style="color:var(--text2)">12:34</div>
+              <div class="result-stat-label">Tempo</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title" style="margin-bottom:12px">Revisão das Questões</div>
+            <div id="result-review"></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button class="btn-primary" style="flex:1" onclick="showExamStep(1)">🔄 Refazer Exame</button>
+            <button class="btn-sm ghost" style="padding:11px 20px" onclick="showPage('competitions')">⚔️ Desafiar Alguém</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: COMPETITIONS ===== -->
+      <div class="page" id="page-competitions">
+        <div class="page-header">
+          <h1>⚔️ Competições</h1>
+          <p>Desafie outros estudantes e suba no ranking</p>
+        </div>
+        <div class="comp-tabs">
+          <div class="comp-tab active" onclick="compTab(this,'duels')">Duelos 1v1</div>
+          <div class="comp-tab" onclick="compTab(this,'group')">Grupos</div>
+          <div class="comp-tab" onclick="compTab(this,'global')">Global</div>
+        </div>
+        <div id="comp-duels">
+          <div style="display:flex;gap:10px;margin-bottom:16px">
+            <button class="btn-sm primary" onclick="alert('Procurando adversário...')">⚔️ Novo Duelo</button>
+            <button class="btn-sm ghost" onclick="alert('Cole o código do adversário')">🔗 Desafiar por Código</button>
+          </div>
+          <div class="duel-card active-duel">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-size:11px;font-weight:600;color:var(--primary2)">🔴 AO VIVO</div>
+              <div style="font-size:11px;color:var(--text3)">Matemática · Difícil</div>
+            </div>
+            <div class="duel-players">
+              <div class="duel-player">
+                <div class="duel-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div>
+                <div><div class="duel-name">Você</div><div style="font-size:10px;color:var(--text3)">Questão 8/15</div></div>
+              </div>
+              <div style="text-align:center">
+                <div class="duel-score-big"><span style="color:var(--accent)">6</span> <span style="color:var(--text3);font-size:16px">–</span> <span style="color:var(--danger)">5</span></div>
+                <div class="vs-badge" style="margin-top:4px">VS</div>
+              </div>
+              <div class="duel-player right">
+                <div class="duel-av" style="background:linear-gradient(135deg,#F5A623,#F55B7A);color:#fff">CS</div>
+                <div style="text-align:right"><div class="duel-name">Carlos S.</div><div style="font-size:10px;color:var(--text3)">Questão 8/15</div></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-sm primary" style="flex:1" onclick="alert('Abrindo duelo ao vivo...')">▶ Continuar Duelo</button>
+              <button class="btn-sm danger">Abandonar</button>
+            </div>
+          </div>
+          <div class="duel-card">
+            <div class="duel-players">
+              <div class="duel-player">
+                <div class="duel-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div>
+                <div><div class="duel-name">Você</div></div>
+              </div>
+              <div style="text-align:center">
+                <div class="duel-score-big" style="color:var(--accent)">WIN</div>
+                <div class="vs-badge" style="margin-top:4px">VS</div>
+              </div>
+              <div class="duel-player right">
+                <div class="duel-av" style="background:linear-gradient(135deg,#9B59B6,#3498DB);color:#fff">MJ</div>
+                <div style="text-align:right"><div class="duel-name">Maria J.</div></div>
+              </div>
+            </div>
+            <div class="duel-meta"><span>Física · Médio</span><span>•</span><span>92% vs 78%</span><span>•</span><span>há 2h</span></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-sm ghost" onclick="alert('Revancha criada!')">🔄 Pedir Revancha</button>
+              <button class="btn-sm ghost">📊 Ver Detalhes</button>
+            </div>
+          </div>
+          <div class="duel-card">
+            <div style="font-size:11px;color:var(--accent2);margin-bottom:8px;font-weight:600">⏳ AGUARDANDO RESPOSTA</div>
+            <div class="duel-players">
+              <div class="duel-player">
+                <div class="duel-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div>
+                <div><div class="duel-name">Você</div></div>
+              </div>
+              <div class="vs-badge">VS</div>
+              <div class="duel-player right">
+                <div class="duel-av" style="background:linear-gradient(135deg,#27AE60,#2ECC71);color:#fff">TM</div>
+                <div style="text-align:right"><div class="duel-name">Tiago M.</div></div>
+              </div>
+            </div>
+            <div class="duel-meta"><span>Química · Fácil</span><span>•</span><span>enviado há 1h</span></div>
+            <button class="btn-sm ghost">Cancelar Convite</button>
+          </div>
+        </div>
+        <div id="comp-group" style="display:none">
+          <div style="display:flex;gap:10px;margin-bottom:14px">
+            <button class="btn-sm primary" onclick="alert('Criar grupo privado')">+ Criar Grupo</button>
+            <button class="btn-sm ghost" onclick="alert('Introduza o código do grupo')">Entrar com Código</button>
+          </div>
+          <div class="duel-card">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">
+              <div><div style="font-weight:700;font-size:14px">🏫 Turma 12ºA — Matemática</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Prof. João Neto · 28 membros</div></div>
+              <div style="background:rgba(0,201,167,.15);color:var(--accent);font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600">Activo</div>
+            </div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Ranking desta semana · Termina domingo</div>
+            <div class="rank-table">
+              <div class="rank-row me"><div class="rank-pos gold">1</div><div class="rank-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div><div class="rank-name">Você <span class="rank-badge">+12</span></div><div class="rank-pts">1847</div></div>
+              <div class="rank-row"><div class="rank-pos silver">2</div><div class="rank-av" style="background:#9B59B6;color:#fff">MJ</div><div class="rank-name">Maria J.</div><div class="rank-pts">1723</div></div>
+              <div class="rank-row"><div class="rank-pos bronze">3</div><div class="rank-av" style="background:#F5A623;color:var(--bg)">TM</div><div class="rank-name">Tiago M.</div><div class="rank-pts">1650</div></div>
+            </div>
+          </div>
+        </div>
+        <div id="comp-global" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+            <div class="duel-card" style="text-align:center;cursor:pointer" onclick="showPage('rankings')">
+              <div style="font-size:28px;margin-bottom:6px">🌍</div>
+              <div style="font-weight:700;font-size:14px">Ranking Global</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:4px">Compete com todos · 4.2k alunos</div>
+              <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--accent);margin-top:8px">#12</div>
+              <div style="font-size:11px;color:var(--text3)">A sua posição</div>
+            </div>
+            <div class="duel-card" style="text-align:center;cursor:pointer">
+              <div style="font-size:28px;margin-bottom:6px">⚡</div>
+              <div style="font-weight:700;font-size:14px">Torneio Relâmpago</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:4px">10 min · 10 questões · Ao vivo</div>
+              <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--accent2);margin-top:8px">18:00</div>
+              <div style="font-size:11px;color:var(--text3)">Hoje · 43 inscritos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: RANKINGS ===== -->
+      <div class="page" id="page-rankings">
+        <div class="page-header">
+          <h1>🏆 Rankings</h1>
+          <p>Classificação global dos melhores estudantes</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <select class="form-select" style="width:auto;font-size:12px;padding:7px 12px">
+            <option>Todas as Disciplinas</option><option>Matemática</option><option>Física</option><option>Química</option>
+          </select>
+          <select class="form-select" style="width:auto;font-size:12px;padding:7px 12px">
+            <option>Esta Semana</option><option>Este Mês</option><option>Geral</option>
+          </select>
+        </div>
+        <!-- TOP 3 -->
+        <div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-end">
+          <div style="flex:1;background:var(--card);border:1px solid rgba(168,168,168,.3);border-radius:12px;padding:16px;text-align:center;order:2">
+            <div style="font-size:28px">🥇</div>
+            <div class="rank-av" style="width:44px;height:44px;background:linear-gradient(135deg,#F5C518,#E8A200);color:var(--bg);font-size:16px;margin:8px auto">LM</div>
+            <div style="font-weight:700;font-size:14px">Luisa M.</div>
+            <div style="font-size:11px;color:var(--text3)">Luanda</div>
+            <div style="font-family:var(--font-head);font-size:20px;font-weight:800;color:#F5C518;margin-top:6px">2340</div>
+          </div>
+          <div style="flex:1;background:var(--card);border:1px solid rgba(91,110,245,.3);border-radius:12px;padding:16px;text-align:center;order:1;margin-bottom:-10px">
+            <div style="font-size:28px">🥈</div>
+            <div class="rank-av" style="width:40px;height:40px;background:linear-gradient(135deg,#A8A8A8,#888);color:#fff;margin:8px auto">JP</div>
+            <div style="font-weight:700;font-size:13px">João P.</div>
+            <div style="font-size:11px;color:var(--text3)">Maputo</div>
+            <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:#A8A8A8;margin-top:6px">2180</div>
+          </div>
+          <div style="flex:1;background:var(--card);border:1px solid rgba(205,127,50,.3);border-radius:12px;padding:16px;text-align:center;order:3;margin-bottom:-10px">
+            <div style="font-size:28px">🥉</div>
+            <div class="rank-av" style="width:40px;height:40px;background:linear-gradient(135deg,#CD7F32,#A0522D);color:#fff;margin:8px auto">AF</div>
+            <div style="font-weight:700;font-size:13px">Ana F.</div>
+            <div style="font-size:11px;color:var(--text3)">Beira</div>
+            <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:#CD7F32;margin-top:6px">2050</div>
+          </div>
+        </div>
+        <div class="rank-table">
+          <div class="rank-row" style="padding:8px 16px;background:var(--bg3)"><span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Pos</span><span style="flex:1;margin-left:44px;font-size:10px;color:var(--text3)">Estudante</span><span style="font-size:10px;color:var(--text3)">Pontos</span></div>
+          <div class="rank-row"><div class="rank-pos" style="color:var(--text3)">4</div><div class="rank-av" style="background:#3498DB;color:#fff">RN</div><div class="rank-name">Rafael N.<div class="rank-sub">Nampula · 45 exames</div></div><div class="rank-pts">1980</div></div>
+          <div class="rank-row"><div class="rank-pos" style="color:var(--text3)">5</div><div class="rank-av" style="background:#E74C3C;color:#fff">CS</div><div class="rank-name">Cláudia S.<div class="rank-sub">Maputo · 38 exames</div></div><div class="rank-pts">1920</div></div>
+          <div class="rank-row" style="color:var(--text3)">…</div>
+          <div class="rank-row" style="background:rgba(91,110,245,.1);border:1px solid rgba(91,110,245,.2);border-radius:8px;margin:4px 8px;padding:10px 12px">
+            <div class="rank-pos" style="color:var(--primary2)">12</div>
+            <div class="rank-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div>
+            <div class="rank-name">Você <span class="rank-badge">A sua posição</span><div class="rank-sub">Maputo · 34 exames</div></div>
+            <div class="rank-pts">1847</div>
+          </div>
+          <div class="rank-row"><div class="rank-pos" style="color:var(--text3)">13</div><div class="rank-av" style="background:#1ABC9C;color:#fff">BM</div><div class="rank-name">Bruno M.<div class="rank-sub">Gaza · 29 exames</div></div><div class="rank-pts">1830</div></div>
+          <div class="rank-row"><div class="rank-pos" style="color:var(--text3)">14</div><div class="rank-av" style="background:#9B59B6;color:#fff">FM</div><div class="rank-name">Fátima M.<div class="rank-sub">Inhambane · 31 exames</div></div><div class="rank-pts">1798</div></div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: ADMIN ===== -->
+      <div class="page" id="page-admin">
+        <div class="page-header">
+          <h1>🏫 Administração</h1>
+          <p>Gestão de turmas, alunos e relatórios</p>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card blue"><div class="stat-icon">👥</div><div class="stat-val">127</div><div class="stat-label">Total de Alunos</div></div>
+          <div class="stat-card green"><div class="stat-icon">🏫</div><div class="stat-val">6</div><div class="stat-label">Turmas Activas</div></div>
+          <div class="stat-card amber"><div class="stat-icon">📝</div><div class="stat-val">843</div><div class="stat-label">Exames Realizados</div></div>
+          <div class="stat-card red"><div class="stat-icon">📊</div><div class="stat-val">81%</div><div class="stat-label">Média da Escola</div></div>
+        </div>
+        <div class="admin-grid">
+          <div class="admin-card">
+            <div class="admin-card-title">
+              Turmas
+              <button class="btn-sm primary" onclick="alert('Criar nova turma')">+ Nova</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Turma</th><th>Alunos</th><th>Média</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <tr><td class="td-name">12ºA — Mat/Fís</td><td>28</td><td>87%</td><td><span class="badge active">Activa</span></td></tr>
+                  <tr><td class="td-name">12ºB — Ciências</td><td>24</td><td>79%</td><td><span class="badge active">Activa</span></td></tr>
+                  <tr><td class="td-name">11ºA — Geral</td><td>30</td><td>74%</td><td><span class="badge active">Activa</span></td></tr>
+                  <tr><td class="td-name">10ºA — Básico</td><td>25</td><td>82%</td><td><span class="badge active">Activa</span></td></tr>
+                  <tr><td class="td-name">Pré-Vestibular</td><td>20</td><td>91%</td><td><span class="badge active">Activa</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-card">
+            <div class="admin-card-title">
+              Alunos com Dificuldades
+              <button class="btn-sm ghost" style="font-size:11px">Ver todos</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Aluno</th><th>Turma</th><th>Progresso</th><th>Média</th></tr></thead>
+                <tbody>
+                  <tr><td class="td-name">Pedro A.</td><td>12ºB</td><td><div class="mini-bar"><div class="mini-fill" style="width:35%;background:var(--danger)"></div></div></td><td style="color:var(--danger)">35%</td></tr>
+                  <tr><td class="td-name">Sofia K.</td><td>11ºA</td><td><div class="mini-bar"><div class="mini-fill" style="width:42%;background:var(--accent2)"></div></div></td><td style="color:var(--accent2)">42%</td></tr>
+                  <tr><td class="td-name">Marco L.</td><td>12ºA</td><td><div class="mini-bar"><div class="mini-fill" style="width:51%;background:var(--accent2)"></div></div></td><td style="color:var(--accent2)">51%</td></tr>
+                  <tr><td class="td-name">Alice M.</td><td>10ºA</td><td><div class="mini-bar"><div class="mini-fill" style="width:58%;background:var(--primary)"></div></div></td><td style="color:var(--primary2)">58%</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-title">
+            Relatório de Desempenho — 12ºA
+            <div style="display:flex;gap:6px">
+              <button class="btn-sm ghost" onclick="alert('Exportando PDF...')">📄 Exportar PDF</button>
+              <button class="btn-sm primary" onclick="alert('Exame criado para turma!')">📝 Criar Exame</button>
+            </div>
+          </div>
+          <div class="bar-chart" style="height:80px">
+            <div class="bar-group"><div class="bar b1" style="height:72px"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:60px;background:var(--accent)"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:80px"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:50px;background:var(--accent2)"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:65px"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:75px;background:var(--accent)"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:55px;background:var(--danger)"></div></div>
+          </div>
+          <div class="bar-labels">
+            <div class="bar-label">Sem 1</div><div class="bar-label">Sem 2</div><div class="bar-label">Sem 3</div>
+            <div class="bar-label">Sem 4</div><div class="bar-label">Sem 5</div><div class="bar-label">Sem 6</div><div class="bar-label">Sem 7</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: PROFILE ===== -->
+      <div class="page" id="page-profile">
+        <div class="page-header">
+          <h1>👤 Perfil</h1>
+          <p>Configurações e conquistas</p>
+        </div>
+        <div class="profile-header">
+          <div class="profile-av">AK</div>
+          <div style="flex:1">
+            <div class="profile-name">António Kumbe</div>
+            <div class="profile-email">antonio.kumbe@email.com</div>
+            <div style="margin-top:6px;display:flex;gap:8px">
+              <span class="badge active">Pro</span>
+              <span style="font-size:11px;color:var(--text3)">Membro desde Jan 2025</span>
+            </div>
+            <div class="profile-stats">
+              <div class="profile-stat"><div class="profile-stat-val" style="color:var(--accent)">87%</div><div class="profile-stat-label">Média</div></div>
+              <div class="profile-stat"><div class="profile-stat-val">34</div><div class="profile-stat-label">Exames</div></div>
+              <div class="profile-stat"><div class="profile-stat-val" style="color:var(--accent2)">8</div><div class="profile-stat-label">Duelos</div></div>
+              <div class="profile-stat"><div class="profile-stat-val" style="color:var(--primary2)">#12</div><div class="profile-stat-label">Ranking</div></div>
+            </div>
+          </div>
+          <button class="btn-sm ghost" style="align-self:flex-start" onclick="alert('Editar perfil')">✏️ Editar</button>
+        </div>
+        <div class="profile-grid">
+          <div class="admin-card">
+            <div class="admin-card-title">Conquistas</div>
+            <div class="achievements-grid">
+              <div class="achievement"><div class="achievement-icon">🔥</div><div class="achievement-name">7 dias seguidos</div></div>
+              <div class="achievement"><div class="achievement-icon">💯</div><div class="achievement-name">Nota perfeita</div></div>
+              <div class="achievement"><div class="achievement-icon">⚔️</div><div class="achievement-name">10 duelos</div></div>
+              <div class="achievement"><div class="achievement-icon">📚</div><div class="achievement-name">30 exames</div></div>
+              <div class="achievement locked"><div class="achievement-icon">🌟</div><div class="achievement-name">Top 10 global</div></div>
+              <div class="achievement locked"><div class="achievement-icon">👑</div><div class="achievement-name">50 vitórias</div></div>
+              <div class="achievement locked"><div class="achievement-icon">🎯</div><div class="achievement-name">Mestre Mat.</div></div>
+              <div class="achievement locked"><div class="achievement-icon">🚀</div><div class="achievement-name">100 exames</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="admin-card" style="margin-bottom:14px">
+              <div class="admin-card-title">Configurações</div>
+              <div style="display:flex;flex-direction:column;gap:12px;font-size:13px">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border)">
+                  <span style="color:var(--text2)">Notificações por email</span>
+                  <div style="width:36px;height:20px;background:var(--primary);border-radius:10px;cursor:pointer;position:relative"><div style="position:absolute;right:2px;top:2px;width:16px;height:16px;background:#fff;border-radius:50%"></div></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border)">
+                  <span style="color:var(--text2)">Desafios de duelo</span>
+                  <div style="width:36px;height:20px;background:var(--primary);border-radius:10px;cursor:pointer;position:relative"><div style="position:absolute;right:2px;top:2px;width:16px;height:16px;background:#fff;border-radius:50%"></div></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="color:var(--text2)">Modo escuro</span>
+                  <div style="width:36px;height:20px;background:var(--primary);border-radius:10px;cursor:pointer;position:relative"><div style="position:absolute;right:2px;top:2px;width:16px;height:16px;background:#fff;border-radius:50%"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-card">
+              <div class="admin-card-title">Plano Actual</div>
+              <div style="background:linear-gradient(135deg,rgba(91,110,245,.15),rgba(0,201,167,.1));border:1px solid rgba(91,110,245,.3);border-radius:10px;padding:14px">
+                <div style="font-family:var(--font-head);font-size:16px;font-weight:700">Pro Plan</div>
+                <div style="font-size:12px;color:var(--text2);margin-top:4px">Exames ilimitados · Tutor IA avançado · Competições premium</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:8px">Renova em 15 Jun 2025</div>
+              </div>
+              <button class="btn-sm ghost" style="width:100%;margin-top:10px;padding:9px" onclick="alert('Gerir subscrição')">Gerir Subscrição</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- NAVIGATION ----
+const pages = {
+  'dashboard':'Dashboard','tutor':'Tutor IA','exams':'Exames',
+  'competitions':'Competições','rankings':'Rankings','admin':'Administração','profile':'Perfil'
+};
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  const pg=document.getElementById('page-'+p);
+  if(pg) pg.classList.add('active');
+  const ni=document.querySelector('[data-page="'+p+'"]');
+  if(ni) ni.classList.add('active');
+  document.getElementById('topbar-title').textContent=pages[p]||p;
+  document.getElementById('notif-panel').style.display='none';
+}
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>showPage(el.dataset.page));
+});
+
+// ---- NOTIFICATIONS ----
+function toggleNotif(){
+  const p=document.getElementById('notif-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.topbar-btn')&&!e.target.closest('.notif-panel'))
+    document.getElementById('notif-panel').style.display='none';
+});
+
+// ---- TUTOR IA ----
+const aiResponses=[
+  "Óptima pergunta! Vamos explorar isso juntos. O conceito que mencionou é fundamental para compreender os temas mais avançados.",
+  "Exactamente! Deixe-me explicar com um exemplo prático que vai tornar este conceito muito mais claro.",
+  "Isso é uma confusão muito comum. A diferença principal é que... vamos ver passo a passo.",
+  "Perfeito! Para praticar este conceito, sugiro o seguinte exercício: resolva este problema usando o método que discutimos.",
+  "Com base no seu desempenho, recomendo focar neste subtema. Quer que eu crie exercícios personalizados?"
+];
+let aiIdx=0;
+function getTime(){const d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+function appendMsg(role,text){
+  const msgs=document.getElementById('chat-messages');
+  const av=role==='user'?'AK':'🤖';
+  const cls=role==='user'?'user':'ai';
+  const m=document.createElement('div');
+  m.className='msg '+cls;
+  m.innerHTML=`<div class="msg-avatar">${av}</div><div><div class="msg-bubble">${text}</div><div class="msg-time">${getTime()}</div></div>`;
+  msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;
+}
+function sendMessage(){
+  const inp=document.getElementById('chat-input');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  appendMsg('user',txt);inp.value='';
+  const typing=document.createElement('div');
+  typing.className='msg ai';typing.id='typing';
+  typing.innerHTML='<div class="msg-avatar">🤖</div><div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>';
+  document.getElementById('chat-messages').appendChild(typing);
+  document.getElementById('chat-messages').scrollTop=99999;
+  setTimeout(()=>{
+    const t=document.getElementById('typing');if(t)t.remove();
+    appendMsg('ai',aiResponses[aiIdx%aiResponses.length]);aiIdx++;
+  },1400);
+}
+function sendQuick(t){document.getElementById('chat-input').value=t;sendMessage();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function newChat(){
+  document.getElementById('chat-messages').innerHTML='<div class="msg ai"><div class="msg-avatar">🤖</div><div><div class="msg-bubble">Olá! Iniciámos uma nova conversa. O que gostaria de estudar?</div><div class="msg-time">'+getTime()+'</div></div></div>';
+}
+
+// ---- EXAMS ----
+const questions=[
+  {q:'Qual é a derivada de f(x) = x³ + 2x² - 5x + 3?',opts:['3x² + 4x - 5','3x² + 4x + 5','x² + 4x - 5','3x + 4 - 5'],correct:0,exp:'A regra da potência diz: d/dx(xⁿ) = nxⁿ⁻¹. Aplicando a cada termo: 3x² + 4x - 5.'},
+  {q:'Para que valor de x a função f(x) = x² - 6x + 8 tem mínimo?',opts:['x = 2','x = 3','x = 4','x = 6'],correct:1,exp:'O mínimo ocorre em x = -b/2a = 6/2 = 3. Ou por f\'(x) = 2x-6 = 0 → x = 3.'},
+  {q:'Qual é o resultado de ∫(2x + 3)dx?',opts:['x² + 3x + C','2x² + 3x + C','x² + 3 + C','2x + 3 + C'],correct:0,exp:'Integrando termo a termo: ∫2x dx = x² e ∫3 dx = 3x, logo x² + 3x + C.'},
+];
+let currentQ=0,userAnswers=[],examStarted=false,timerInterval=null,totalSecs=2700;
+
+function selectDiff(el,cls){
+  document.querySelectorAll('.diff-btn').forEach(b=>{b.classList.remove('active');});
+  el.classList.add('active');
+}
+function startExam(){
+  currentQ=0;userAnswers=new Array(questions.length).fill(null);
+  showExamStep(2);renderQuestion();startTimer();
+}
+function showExamStep(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('exam-step'+i).style.display=i===n?'block':'none';
+    const tab=document.getElementById('step'+i+'-tab');
+    tab.classList.toggle('active',i===n);
+    tab.classList.toggle('done',i<n);
+  });
+}
+function renderQuestion(){
+  const q=questions[currentQ];
+  document.getElementById('q-current').textContent=currentQ+1;
+  document.getElementById('q-total').textContent=questions.length;
+  document.getElementById('exam-fill').style.width=((currentQ+1)/questions.length*100)+'%';
+  document.getElementById('btn-prev').style.display=currentQ>0?'block':'none';
+  const isLast=currentQ===questions.length-1;
+  document.getElementById('btn-next').style.display=isLast?'none':'block';
+  document.getElementById('btn-submit').style.display=isLast?'block':'none';
+  const container=document.getElementById('exam-questions');
+  container.innerHTML=`<div class="q-card">
+    <div class="q-badge">Questão ${currentQ+1} · Álgebra</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-options" id="opts">
+      ${q.opts.map((o,i)=>`<div class="q-option${userAnswers[currentQ]===i?' selected':''}" onclick="selectOpt(${i})">
+        <div class="opt-letter">${'ABCD'[i]}</div>${o}</div>`).join('')}
+    </div>
+  </div>`;
+}
+function selectOpt(i){
+  userAnswers[currentQ]=i;
+  document.querySelectorAll('.q-option').forEach((el,idx)=>{
+    el.classList.toggle('selected',idx===i);
+  });
+}
+function nextQ(){if(currentQ<questions.length-1){currentQ++;renderQuestion();}}
+function prevQ(){if(currentQ>0){currentQ--;renderQuestion();}}
+function startTimer(){
+  if(timerInterval)clearInterval(timerInterval);
+  let s=totalSecs;
+  timerInterval=setInterval(()=>{
+    s--;
+    if(s<=0){clearInterval(timerInterval);submitExam();return;}
+    const m=Math.floor(s/60),sec=s%60;
+    document.getElementById('exam-timer').textContent=m+':'+(sec<10?'0':'')+sec;
+  },1000);
+}
+function submitExam(){
+  if(timerInterval)clearInterval(timerInterval);
+  let correct=0;
+  questions.forEach((q,i)=>{if(userAnswers[i]===q.correct)correct++;});
+  const pct=Math.round(correct/questions.length*100);
+  document.getElementById('result-score').textContent=pct+'%';
+  document.getElementById('result-score').className='result-score '+(pct>=80?'good':pct>=60?'ok':'bad');
+  document.getElementById('res-correct').textContent=correct;
+  document.getElementById('res-wrong').textContent=questions.length-correct;
+  const rev=document.getElementById('result-review');
+  rev.innerHTML=questions.map((q,i)=>{
+    const ua=userAnswers[i];const ok=ua===q.correct;
+    return `<div style="margin-bottom:12px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid ${ok?'rgba(0,201,167,.25)':'rgba(245,91,122,.25)'}">
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:${ok?'var(--accent)':'var(--danger)'}">${ok?'✓':'✗'} Questão ${i+1}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${q.q}</div>
+      <div style="font-size:11px">Sua resposta: <strong style="color:${ok?'var(--accent)':'var(--danger)'}">${ua!==null?'ABCD'[ua]+') '+q.opts[ua]:'Não respondida'}</strong></div>
+      ${!ok?`<div style="font-size:11px;margin-top:2px">Correcta: <strong style="color:var(--accent)">${'ABCD'[q.correct]}) ${q.opts[q.correct]}</strong></div>`:''}
+      <div class="q-explanation"><strong>💡 Explicação:</strong> ${q.exp}</div>
+    </div>`;
+  }).join('');
+  showExamStep(3);
+}
+
+// ---- COMPETITIONS ----
+function compTab(el,tab){
+  document.querySelectorAll('.comp-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['duels','group','global'].forEach(t=>document.getElementById('comp-'+t).style.display=t===tab?'block':'none');
+}
+</script>

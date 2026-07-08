@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#07080F;--bg2:#0E1020;--bg3:#141629;--card:#181B30;--card2:#1E2240;
+  --border:#252A45;--border2:#2E3560;
+  --primary:#5B6EF5;--primary2:#7B8EFF;--accent:#00C9A7;--accent2:#F5A623;--danger:#F55B7A;
+  --text:#E8EAF6;--text2:#9BA3CC;--text3:#5A6494;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --topbar-h:52px;
+  --nav-h:60px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+
+html{height:100%;height:-webkit-fill-available}
+body{
+  font-family:var(--font-body);background:var(--bg);color:var(--text);
+  height:100dvh;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+
+/* ─── APP SHELL ─────────────────────────────────── */
+.app{
+  display:flex;flex-direction:column;
+  width:100%;max-width:430px;margin:0 auto;
+  height:100dvh;overflow:hidden;position:relative;
+}
+
+/* ─── TOPBAR ─────────────────────────────────────── */
+.topbar{
+  height:var(--topbar-h);background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 14px;gap:10px;
+  flex-shrink:0;z-index:60;position:relative;
+  padding-top:env(safe-area-inset-top,0px);
+}
+.topbar-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.topbar-logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.topbar-title{font-family:var(--font-head);font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-actions{display:flex;gap:6px;flex-shrink:0}
+.topbar-btn{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;color:var(--text2);position:relative;
+  touch-action:manipulation;
+}
+.topbar-btn:active{background:var(--bg3)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--danger);border-radius:50%;border:1.5px solid var(--bg2)}
+
+/* ─── CONTENT AREA ───────────────────────────────── */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;position:relative}
+.page{display:none;padding:16px;padding-bottom:20px;animation:fadeIn .18s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ─── BOTTOM NAV — 5 itens max ───────────────────── */
+.bottom-nav{
+  background:var(--bg2);border-top:1px solid var(--border);
+  display:flex;align-items:stretch;flex-shrink:0;z-index:60;
+  padding-bottom:var(--safe-bottom);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;cursor:pointer;
+  padding:10px 4px 8px;position:relative;
+  touch-action:manipulation;min-height:52px;
+}
+.nav-item:active{background:var(--bg3)}
+.nav-icon{font-size:22px;line-height:1;transition:transform .1s}
+.nav-item.active .nav-icon{transform:scale(1.1)}
+.nav-label{font-size:10px;font-weight:500;color:var(--text3);transition:color .15s;white-space:nowrap}
+.nav-item.active .nav-label{color:var(--primary2)}
+.nav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:2.5px;background:var(--primary);border-radius:0 0 3px 3px}
+.nav-badge{position:absolute;top:7px;left:calc(50% + 6px);background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;min-width:15px;text-align:center;line-height:1.4}
+
+/* ─── MORE MENU (substitui Admin na nav) ─────────── */
+.more-sheet{
+  position:fixed;inset:0;z-index:200;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  pointer-events:none;
+}
+.more-sheet.open{pointer-events:auto}
+.more-backdrop{
+  position:absolute;inset:0;background:rgba(0,0,0,0);
+  transition:background .25s;
+}
+.more-sheet.open .more-backdrop{background:rgba(0,0,0,.55)}
+.more-panel{
+  position:relative;background:var(--bg2);
+  border-top:1px solid var(--border);border-radius:20px 20px 0 0;
+  padding:0 0 calc(var(--safe-bottom) + 16px);
+  transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+}
+.more-sheet.open .more-panel{transform:translateY(0)}
+.more-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 16px}
+.more-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 8px}
+.more-item{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:16px 14px;display:flex;flex-direction:column;gap:8px;
+  cursor:pointer;touch-action:manipulation;
+}
+.more-item:active{background:var(--bg3)}
+.more-icon{font-size:24px}
+.more-label{font-size:13px;font-weight:600;color:var(--text)}
+.more-sub{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* ─── BOTTOM SHEET (Notificações) ────────────────── */
+.sheet{
+  position:fixed;inset:0;z-index:150;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  pointer-events:none;
+}
+.sheet.open{pointer-events:auto}
+.sheet-backdrop{
+  position:absolute;inset:0;background:rgba(0,0,0,0);
+  transition:background .25s;
+}
+.sheet.open .sheet-backdrop{background:rgba(0,0,0,.55)}
+.sheet-panel{
+  position:relative;background:var(--bg2);
+  border-top:1px solid var(--border);border-radius:20px 20px 0 0;
+  max-height:70dvh;display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  padding-bottom:calc(var(--safe-bottom) + 8px);
+}
+.sheet.open .sheet-panel{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 4px}
+.sheet-header{padding:10px 16px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.sheet-title{font-family:var(--font-head);font-size:15px;font-weight:700}
+.sheet-close{font-size:12px;color:var(--primary2);cursor:pointer;padding:4px 8px}
+.sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.notif-item{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;gap:12px;cursor:pointer;align-items:flex-start}
+.notif-item:last-child{border-bottom:none}
+.notif-item.unread{background:rgba(91,110,245,.06)}
+.notif-dot2{width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px}
+.notif-dot2.empty{background:transparent}
+.notif-text{font-size:13px;color:var(--text2);line-height:1.5;flex:1}
+.notif-text strong{color:var(--text)}
+.notif-time{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* ─── PAGE HEADERS ───────────────────────────────── */
+.page-header{margin-bottom:18px}
+.page-header h1{font-family:var(--font-head);font-size:20px;font-weight:700}
+.page-header p{font-size:12px;color:var(--text2);margin-top:3px}
+
+/* ─── CARDS ──────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:12px}
+.card-title{font-family:var(--font-head);font-size:13px;font-weight:700;margin-bottom:12px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+
+/* ─── STATS 2×2 ──────────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.stat-card.blue::before{background:var(--primary)}
+.stat-card.green::before{background:var(--accent)}
+.stat-card.amber::before{background:var(--accent2)}
+.stat-card.red::before{background:var(--danger)}
+.stat-icon{font-size:20px;margin-bottom:7px}
+.stat-val{font-family:var(--font-head);font-size:24px;font-weight:800;line-height:1}
+.stat-label{font-size:10px;color:var(--text2);margin-top:3px}
+.stat-change{font-size:10px;margin-top:5px}
+.stat-change.up{color:var(--accent)}.stat-change.down{color:var(--danger)}
+
+/* ─── COLLAPSIBLE SECTIONS ───────────────────────── */
+.collapse-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;touch-action:manipulation;
+  padding:4px 0;margin-bottom:10px;
+}
+.collapse-arrow{font-size:12px;color:var(--text3);transition:transform .2s}
+.collapse-arrow.open{transform:rotate(180deg)}
+.collapse-body{overflow:hidden;transition:max-height .25s ease}
+
+/* ─── BAR CHART ──────────────────────────────────── */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:72px}
+.bar-group{flex:1;display:flex;align-items:flex-end;gap:2px}
+.bar{flex:1;border-radius:3px 3px 0 0;min-height:4px}
+.bar.b1{background:var(--primary)}.bar.b2{background:var(--accent)}
+.bar-labels{display:flex;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.bar-label{flex:1;text-align:center;font-size:9px;color:var(--text3)}
+.chart-tabs{display:flex;gap:4px}
+.chart-tab{font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;color:var(--text2);border:1px solid transparent;touch-action:manipulation}
+.chart-tab.active{background:rgba(91,110,245,.2);color:var(--primary2);border-color:rgba(91,110,245,.3)}
+
+/* ─── PROGRESS ───────────────────────────────────── */
+.progress-item{margin-bottom:11px}
+.progress-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.progress-label{color:var(--text2)}.progress-val{color:var(--text);font-weight:500}
+.progress-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px}
+
+/* ─── ACTIVITY ───────────────────────────────────── */
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none;padding-bottom:0}
+.activity-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.activity-text{flex:1;font-size:12px;color:var(--text2);line-height:1.4}
+.activity-time{font-size:10px;color:var(--text3);white-space:nowrap;margin-top:1px}
+
+/* ─── TUTOR: CHAT FULL-SCREEN ────────────────────── */
+/* O chat tem o seu próprio layout — não partilha scroll com o content */
+#page-tutor{
+  display:none;flex-direction:column;
+  padding:0;
+  /* ocupa todo o espaço disponível */
+  height:100%;
+}
+#page-tutor.active{display:flex}
+
+.chat-sessions{
+  display:flex;gap:8px;overflow-x:auto;padding:12px 14px 10px;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  background:var(--bg2);
+}
+.chat-sessions::-webkit-scrollbar{display:none}
+.chat-chip{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-size:12px;color:var(--text2);white-space:nowrap;cursor:pointer;flex-shrink:0;touch-action:manipulation}
+.chat-chip:active{background:var(--bg3)}
+.chat-chip.active{background:rgba(91,110,245,.15);border-color:rgba(91,110,245,.4);color:var(--primary2)}
+.new-chat-chip{background:rgba(91,110,245,.12);border:1px solid rgba(91,110,245,.3);border-radius:20px;padding:6px 13px;font-size:12px;color:var(--primary2);white-space:nowrap;cursor:pointer;flex-shrink:0;font-weight:600;touch-action:manipulation}
+
+.chat-messages{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;gap:10px;
+  padding:14px;
+}
+.msg{display:flex;gap:8px;max-width:90%}
+.msg.user{flex-direction:row-reverse;align-self:flex-end}
+.msg-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:2px}
+.msg.ai .msg-av{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff}
+.msg.user .msg-av{background:var(--accent2);color:var(--bg)}
+.msg-bubble{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.55;color:var(--text)}
+.msg.user .msg-bubble{background:rgba(91,110,245,.2);border-color:rgba(91,110,245,.4)}
+.msg-time{font-size:9px;color:var(--text3);margin-top:3px;padding:0 2px}
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:4px 0}
+.typing-dot{width:5px;height:5px;border-radius:50%;background:var(--primary2);animation:pulse 1.2s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1);opacity:1}}
+
+/* Input area — fica acima do teclado virtual via visualViewport */
+.chat-input-area{
+  flex-shrink:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:10px 14px;
+  padding-bottom:calc(10px + var(--safe-bottom));
+  transition:padding-bottom .08s;
+}
+.chat-actions{display:flex;gap:6px;margin-bottom:9px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.chat-actions::-webkit-scrollbar{display:none}
+.chat-action-btn{
+  background:var(--bg3);border:1px solid var(--border);border-radius:16px;
+  padding:6px 11px;font-size:11px;color:var(--text2);cursor:pointer;
+  font-family:var(--font-body);white-space:nowrap;flex-shrink:0;
+  touch-action:manipulation;
+}
+.chat-action-btn:active{background:var(--card)}
+.chat-input-row{display:flex;gap:8px;align-items:flex-end}
+.chat-textarea{
+  flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  padding:10px 13px;color:var(--text);font-size:14px;font-family:var(--font-body);
+  resize:none;outline:none;max-height:90px;transition:border .15s;line-height:1.4;
+  -webkit-appearance:none;
+}
+.chat-textarea:focus{border-color:var(--primary)}
+.chat-send{
+  width:42px;height:42px;background:var(--primary);border:none;border-radius:12px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:17px;color:#fff;flex-shrink:0;touch-action:manipulation;
+}
+.chat-send:active{background:var(--primary2)}
+
+/* ─── EXAMES ─────────────────────────────────────── */
+.exam-steps{display:flex;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.exam-step{flex:1;padding:11px 6px;text-align:center;font-size:11px;color:var(--text3);border-right:1px solid var(--border);position:relative}
+.exam-step:last-child{border-right:none}
+.exam-step.active{background:rgba(91,110,245,.15);color:var(--primary2)}
+.exam-step.done{color:var(--accent)}
+.exam-step-num{display:block;font-family:var(--font-head);font-size:17px;font-weight:700;margin-bottom:1px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;color:var(--text2);font-weight:500;margin-bottom:6px;display:block}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:14px;font-family:var(--font-body);outline:none;-webkit-appearance:none;appearance:none}
+.form-select:focus{border-color:var(--primary)}
+.diff-btns{display:flex;gap:8px}
+.diff-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 6px;font-size:13px;color:var(--text2);cursor:pointer;text-align:center;font-family:var(--font-body);touch-action:manipulation}
+.diff-btn:active{opacity:.8}
+.diff-btn.easy.active{background:rgba(0,201,167,.15);border-color:var(--accent);color:var(--accent)}
+.diff-btn.med.active{background:rgba(245,166,35,.15);border-color:var(--accent2);color:var(--accent2)}
+.diff-btn.hard.active{background:rgba(245,91,122,.15);border-color:var(--danger);color:var(--danger)}
+.btn-primary{
+  width:100%;background:var(--primary);color:#fff;border:none;border-radius:12px;
+  padding:15px;font-size:15px;font-weight:600;font-family:var(--font-body);cursor:pointer;
+  touch-action:manipulation;
+}
+.btn-primary:active{background:var(--primary2)}
+.btn-sm{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);border:none;touch-action:manipulation}
+.btn-sm.primary{background:var(--primary);color:#fff}
+.btn-sm.ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-sm.danger{background:rgba(245,91,122,.15);color:var(--danger);border:1px solid rgba(245,91,122,.3)}
+.btn-sm:active{opacity:.8}
+
+/* EXAM RUNNING */
+.exam-header{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.exam-timer{font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--danger)}
+.exam-progress-bar{height:4px;background:var(--bg3);border-radius:2px;margin:8px 0 0;overflow:hidden}
+.exam-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:2px;transition:width .3s}
+/* Botões de navegação do exame — full-width para toque fácil */
+.exam-nav{display:flex;gap:10px;margin-top:14px}
+.exam-nav .btn-sm,.exam-nav .btn-submit{flex:1;padding:15px;font-size:14px;text-align:center}
+.btn-submit{background:var(--accent);color:var(--bg);border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);touch-action:manipulation}
+.btn-submit:active{opacity:.85}
+
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.q-badge{display:inline-block;background:rgba(91,110,245,.2);color:var(--primary2);font-size:10px;padding:3px 10px;border-radius:20px;margin-bottom:10px}
+.q-text{font-size:14px;line-height:1.65;margin-bottom:14px;color:var(--text)}
+.q-options{display:flex;flex-direction:column;gap:8px}
+.q-option{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;
+  cursor:pointer;font-size:13px;transition:border-color .15s,background .15s;
+  min-height:50px;touch-action:manipulation;
+}
+.q-option:active{background:var(--card)}
+.q-option.selected{background:rgba(91,110,245,.15);border-color:var(--primary)}
+.q-option.correct{background:rgba(0,201,167,.12);border-color:var(--accent);color:var(--accent)}
+.q-option.wrong{background:rgba(245,91,122,.12);border-color:var(--danger);color:var(--danger)}
+.opt-letter{width:24px;height:24px;border-radius:7px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.q-explanation{background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text2);margin-top:10px;line-height:1.6}
+.q-explanation strong{color:var(--accent)}
+
+/* RESULTS */
+.result-header{text-align:center;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:12px}
+.result-score{font-family:var(--font-head);font-size:56px;font-weight:800}
+.result-score.good{color:var(--accent)}.result-score.ok{color:var(--accent2)}.result-score.bad{color:var(--danger)}
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.result-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;text-align:center}
+.result-stat-val{font-family:var(--font-head);font-size:22px;font-weight:700}
+.result-stat-label{font-size:10px;color:var(--text2);margin-top:3px}
+.recent-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.recent-row:last-child{border-bottom:none;padding-bottom:0}
+
+/* ─── COMPETIÇÕES ────────────────────────────────── */
+.comp-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.comp-tabs::-webkit-scrollbar{display:none}
+.comp-tab{padding:8px 16px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);border:1px solid var(--border);white-space:nowrap;flex-shrink:0;touch-action:manipulation}
+.comp-tab.active{background:rgba(91,110,245,.2);color:var(--primary2);border-color:rgba(91,110,245,.4)}
+.duel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:10px}
+.duel-card.active-duel{border-color:rgba(91,110,245,.5)}
+.duel-players{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.duel-player{flex:1;display:flex;align-items:center;gap:8px}
+.duel-player.right{flex-direction:row-reverse}
+.duel-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.duel-name{font-size:13px;font-weight:600}
+.duel-score-big{font-family:var(--font-head);font-size:24px;font-weight:800}
+.vs-badge{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--text2)}
+.duel-meta{display:flex;gap:8px;font-size:10px;color:var(--text3);margin-bottom:10px;flex-wrap:wrap}
+.duel-actions{display:flex;gap:8px}
+.duel-actions .btn-sm{flex:1;text-align:center}
+
+/* ─── RANKINGS ───────────────────────────────────── */
+.rank-table{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.rank-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.rank-row:last-child{border-bottom:none}
+.rank-row.me{background:rgba(91,110,245,.08)}
+.rank-pos{font-family:var(--font-head);font-size:15px;font-weight:800;width:26px;text-align:center;flex-shrink:0}
+.rank-pos.gold{color:#F5C518}.rank-pos.silver{color:#A8A8A8}.rank-pos.bronze{color:#CD7F32}
+.rank-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.rank-name{flex:1;font-size:13px;font-weight:500}
+.rank-sub{font-size:10px;color:var(--text3)}
+.rank-pts{font-family:var(--font-head);font-size:14px;font-weight:700;color:var(--primary2);flex-shrink:0}
+.rank-badge{font-size:9px;background:rgba(0,201,167,.15);color:var(--accent);padding:2px 7px;border-radius:8px}
+.top3-row{display:flex;gap:8px;margin-bottom:14px;align-items:flex-end}
+.top3-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 8px;text-align:center}
+.top3-card.first{border-color:rgba(245,197,24,.3)}
+.top3-card.silver,.top3-card.bronze{margin-bottom:-10px}
+
+/* ─── ADMIN ──────────────────────────────────────── */
+.admin-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.admin-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:10px}
+.admin-card-title{font-family:var(--font-head);font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.data-table{width:100%;border-collapse:collapse;font-size:11px;min-width:260px}
+.data-table th{text-align:left;padding:8px 10px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border)}
+.data-table td{padding:9px 10px;border-bottom:1px solid rgba(37,42,69,.5);color:var(--text2)}
+.data-table tr:last-child td{border-bottom:none}
+.td-name{color:var(--text);font-weight:500}
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;font-weight:500}
+.badge.active{background:rgba(0,201,167,.15);color:var(--accent)}
+.mini-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;width:44px;display:inline-block;vertical-align:middle}
+.mini-fill{height:100%;border-radius:2px}
+
+/* ─── PROFESSORES ─────────────────────────────────── */
+.teacher-tabs{display:flex;gap:6px;margin-bottom:14px}
+.teacher-tab{flex:1;padding:10px 6px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);border:1px solid var(--border);text-align:center;touch-action:manipulation}
+.teacher-tab.active{background:rgba(91,110,245,.2);color:var(--primary2);border-color:rgba(91,110,245,.4)}
+.teacher-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.teacher-card-body{display:flex;gap:12px;padding:14px}
+.teacher-av{width:52px;height:52px;border-radius:14px;background:var(--bg3);flex-shrink:0;position:relative;object-fit:cover}
+.teacher-status-dot{position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;border-radius:50%;border:2px solid var(--card)}
+.teacher-status-dot.online{background:var(--accent)}
+.teacher-status-dot.offline{background:var(--text3)}
+.teacher-info{flex:1;min-width:0}
+.teacher-name{font-size:14px;font-weight:700;color:var(--text)}
+.teacher-subject{font-size:11px;color:var(--primary2);font-weight:500;margin-top:2px}
+.teacher-meta{display:flex;gap:10px;margin-top:6px;font-size:10px;color:var(--text3)}
+.teacher-price{font-size:12px;font-weight:700;color:var(--accent)}
+.teacher-rating{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--accent2)}
+.teacher-actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border)}
+.teacher-actions .btn-sm{flex:1;text-align:center;font-size:12px;padding:10px 8px}
+.request-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.request-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.request-info{flex:1}
+.request-subject{font-size:14px;font-weight:700;color:var(--text)}
+.request-from{font-size:11px;color:var(--text3);margin-top:2px}
+.request-status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px}
+.request-status.pending{background:rgba(245,166,35,.15);color:var(--accent2)}
+.request-status.accepted{background:rgba(0,201,167,.15);color:var(--accent)}
+.request-status.rejected{background:rgba(245,91,122,.15);color:var(--danger)}
+.request-status.completed{background:rgba(91,110,245,.15);color:var(--primary2)}
+.request-desc{background:var(--bg3);border-left:3px solid var(--primary);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(--text2);font-style:italic;margin-bottom:10px}
+.request-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+.request-price{font-size:14px;font-weight:700;color:var(--text)}
+.request-actions{display:flex;gap:6px}
+.request-actions .btn-sm{padding:8px 14px;font-size:11px}
+.teacher-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;pointer-events:none;opacity:0;transition:opacity .25s}
+.teacher-modal-overlay.open{pointer-events:auto;opacity:1}
+.teacher-modal-panel{background:var(--bg2);border-top:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px calc(var(--safe-bottom) + 20px);transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.teacher-modal-overlay.open .teacher-modal-panel{transform:translateY(0)}
+.teacher-modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px}
+.teacher-modal-title{font-family:var(--font-head);font-size:20px;font-weight:800;text-align:center;margin-bottom:20px}
+.teacher-modal-info{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.teacher-modal-av{width:52px;height:52px;border-radius:14px;background:var(--bg3)}
+.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:14px;font-family:var(--font-body);resize:none;outline:none;transition:border .15s;line-height:1.5;-webkit-appearance:none;height:80px}
+.form-textarea:focus{border-color:var(--primary)}
+.security-note{background:rgba(91,110,245,.1);border:1px solid rgba(91,110,245,.25);border-radius:12px;padding:13px 14px;display:flex;gap:10px;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.5}
+.teacher-quick-link{background:linear-gradient(135deg,rgba(91,110,245,.15),rgba(0,201,167,.1));border:1px solid rgba(91,110,245,.3);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;margin-bottom:12px;touch-action:manipulation}
+.teacher-quick-link:active{opacity:.85}
+.teacher-quick-icon{width:44px;height:44px;background:var(--primary);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.teacher-quick-text{flex:1}
+.teacher-quick-title{font-size:14px;font-weight:700;color:var(--text)}
+.teacher-quick-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.teacher-quick-arrow{font-size:20px;color:var(--text3)}
+.online-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;display:inline-block;margin-right:4px;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ─── AVALIAÇÃO DE PROFESSOR ─────────────────────────── */
+.rating-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .25s;padding:20px}
+.rating-modal-overlay.open{pointer-events:auto;opacity:1}
+.rating-modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px;padding:28px 22px;width:100%;max-width:360px;transform:scale(.94) translateY(20px);transition:transform .25s cubic-bezier(.34,1.56,.64,1);text-align:center}
+.rating-modal-overlay.open .rating-modal-box{transform:scale(1) translateY(0)}
+.rating-av-big{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:26px;color:#fff;margin:0 auto 14px}
+.rating-title{font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:4px}
+.rating-sub{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.4}
+.stars-row{display:flex;justify-content:center;gap:8px;margin-bottom:6px}
+.star-btn{font-size:36px;cursor:pointer;transition:transform .15s,opacity .15s;touch-action:manipulation;line-height:1;filter:grayscale(1);opacity:.35}
+.star-btn.active,.star-btn:hover{filter:none;opacity:1;transform:scale(1.15)}
+.rating-label{font-size:13px;font-weight:600;color:var(--accent2);margin-bottom:18px;height:20px;transition:opacity .15s}
+.rating-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:13px;font-family:var(--font-body);resize:none;outline:none;transition:border .15s;line-height:1.5;height:72px;text-align:left}
+.rating-textarea:focus{border-color:var(--primary)}
+.rating-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0 16px}
+.rating-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;touch-action:manipulation;transition:background .15s,border-color .15s,color .15s}
+.rating-chip.selected{background:rgba(91,110,245,.2);border-color:var(--primary);color:var(--primary2)}
+.rating-actions{display:flex;gap:10px;margin-top:4px}
+.rating-actions .btn-sm{flex:1;padding:14px;font-size:13px}
+
+/* ─── PERFIL ─────────────────────────────────────── */
+.profile-header{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 16px;margin-bottom:12px;text-align:center}
+.profile-av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:26px;font-weight:800;color:#fff;margin:0 auto 12px}
+.profile-name{font-family:var(--font-head);font-size:20px;font-weight:800}
+.profile-email{font-size:12px;color:var(--text2);margin-top:3px}
+.profile-stats{display:flex;justify-content:center;gap:0;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.profile-stat{flex:1;text-align:center;padding:0 4px;border-right:1px solid var(--border)}
+.profile-stat:last-child{border-right:none}
+.profile-stat-val{font-family:var(--font-head);font-size:18px;font-weight:700}
+.profile-stat-label{font-size:10px;color:var(--text3);margin-top:2px}
+.achievements-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.achievement{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px 6px;text-align:center;cursor:pointer;touch-action:manipulation}
+.achievement:active{background:var(--card)}
+.achievement-icon{font-size:22px;margin-bottom:5px}
+.achievement-name{font-size:10px;color:var(--text2);font-weight:500;line-height:1.3}
+.achievement.locked{opacity:.35}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none;padding-bottom:0}
+.toggle{width:40px;height:22px;border-radius:11px;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s;touch-action:manipulation}
+.toggle.on{background:var(--primary)}.toggle.off{background:var(--border2)}
+.toggle-knob{position:absolute;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left .2s}
+.toggle.on .toggle-knob{left:21px}.toggle.off .toggle-knob{left:3px}
+
+/* ─── MISC ───────────────────────────────────────── */
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+
+<div class="app" id="app">
+
+  <!-- ══ TOPBAR ══ -->
+  <div class="topbar" id="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo-icon">🎓</div>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+    </div>
+    <div class="topbar-actions">
+      <div class="topbar-btn" id="notif-btn" onclick="openSheet('notif-sheet')">
+        🔔<div class="notif-dot" id="notif-dot"></div>
+      </div>
+      <div class="topbar-btn" onclick="showPage('profile')">⚙️</div>
+    </div>
+  </div>
+
+  <!-- ══ CONTENT ══ -->
+  <div class="content" id="main-content">
+
+    <!-- ──────────────── DASHBOARD ──────────────── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1>Bom dia, António 👋</h1>
+        <p>Aqui está o resumo do seu desempenho</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card blue"><div class="stat-icon">📈</div><div class="stat-val">87%</div><div class="stat-label">Média geral</div><div class="stat-change up">↑ 4% esta semana</div></div>
+        <div class="stat-card green"><div class="stat-icon">📝</div><div class="stat-val">34</div><div class="stat-label">Exames feitos</div><div class="stat-change up">↑ 6 esta semana</div></div>
+        <div class="stat-card amber"><div class="stat-icon">🏆</div><div class="stat-val">#12</div><div class="stat-label">Posição global</div><div class="stat-change up">↑ 3 posições</div></div>
+        <div class="stat-card red"><div class="stat-icon">⚔️</div><div class="stat-val">8/11</div><div class="stat-label">Duelos ganhos</div><div class="stat-change down">73% vitórias</div></div>
+      </div>
+
+      <!-- Desempenho - colapsável -->
+      <div class="card">
+        <div class="collapse-toggle" onclick="toggleCollapse('chart-body','chart-arrow')">
+          <div class="card-header" style="margin:0;flex:1">
+            <div class="card-title" style="margin:0">Desempenho por Disciplina</div>
+            <div class="chart-tabs" onclick="event.stopPropagation()">
+              <div class="chart-tab active">Semana</div>
+              <div class="chart-tab">Mês</div>
+            </div>
+          </div>
+          <span class="collapse-arrow open" id="chart-arrow" style="margin-left:8px">▼</span>
+        </div>
+        <div class="collapse-body" id="chart-body" style="max-height:200px">
+          <div class="bar-chart">
+            <div class="bar-group"><div class="bar b1" style="height:58px"></div><div class="bar b2" style="height:64px"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:68px"></div><div class="bar b2" style="height:48px"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:40px"></div><div class="bar b2" style="height:56px"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:72px"></div><div class="bar b2" style="height:68px"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:36px"></div><div class="bar b2" style="height:44px"></div></div>
+            <div class="bar-group"><div class="bar b1" style="height:62px"></div><div class="bar b2" style="height:52px"></div></div>
+          </div>
+          <div class="bar-labels"><div class="bar-label">Mat</div><div class="bar-label">Fís</div><div class="bar-label">Quím</div><div class="bar-label">Biol</div><div class="bar-label">Hist</div><div class="bar-label">Port</div></div>
+          <div style="display:flex;gap:12px;margin-top:10px;font-size:10px;color:var(--text3)">
+            <span><span style="display:inline-block;width:8px;height:8px;background:var(--primary);border-radius:2px;margin-right:4px;vertical-align:middle"></span>Acertos</span>
+            <span><span style="display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:2px;margin-right:4px;vertical-align:middle"></span>Média turma</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progresso colapsável -->
+      <div class="card">
+        <div class="collapse-toggle" onclick="toggleCollapse('prog-body','prog-arrow')">
+          <div class="card-title" style="margin:0;flex:1">Progresso por Tema</div>
+          <span class="collapse-arrow open" id="prog-arrow">▼</span>
+        </div>
+        <div class="collapse-body" id="prog-body" style="max-height:200px">
+          <div class="progress-item"><div class="progress-header"><span class="progress-label">Álgebra Linear</span><span class="progress-val">92%</span></div><div class="progress-bar"><div class="progress-fill" style="width:92%;background:var(--accent)"></div></div></div>
+          <div class="progress-item"><div class="progress-header"><span class="progress-label">Mecânica Clássica</span><span class="progress-val">78%</span></div><div class="progress-bar"><div class="progress-fill" style="width:78%;background:var(--primary)"></div></div></div>
+          <div class="progress-item"><div class="progress-header"><span class="progress-label">Química Orgânica</span><span class="progress-val">65%</span></div><div class="progress-bar"><div class="progress-fill" style="width:65%;background:var(--accent2)"></div></div></div>
+          <div class="progress-item" style="margin-bottom:0"><div class="progress-header"><span class="progress-label">Genética</span><span class="progress-val">45%</span></div><div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--danger)"></div></div></div>
+        </div>
+      </div>
+
+      <!-- Actividade recente -->
+      <div class="card">
+        <div class="card-title">Actividade Recente</div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--accent)"></div><div class="activity-text">Completou exame de <strong>Matemática</strong> — 92%</div><div class="activity-time">há 2h</div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--primary)"></div><div class="activity-text">Ganhou duelo vs <strong>Maria J.</strong> em Física</div><div class="activity-time">hoje</div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--accent2)"></div><div class="activity-text">Estudou <strong>Química Org.</strong> com o Tutor IA</div><div class="activity-time">ontem</div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--danger)"></div><div class="activity-text">Perdeu duelo vs <strong>Tiago M.</strong> em Biologia</div><div class="activity-time">2 dias</div></div>
+        <div class="activity-item" style="border-bottom:none"><div class="activity-dot" style="background:var(--accent)"></div><div class="activity-text">Subiu para <strong>#12</strong> no ranking global</div><div class="activity-time">3 dias</div></div>
+      </div>
+
+      <!-- Próximos Eventos -->
+      <div class="card">
+        <div class="card-title">Próximos Eventos</div>
+        <div style="background:rgba(91,110,245,.1);border:1px solid rgba(91,110,245,.25);border-radius:10px;padding:11px 13px;margin-bottom:8px"><div style="font-size:13px;font-weight:600">Competição Semanal</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Matemática Geral · Domingo 20h</div></div>
+        <div style="background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:10px;padding:11px 13px"><div style="font-size:13px;font-weight:600">Simulado Admissão</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Todas as disciplinas · Sábado 14h</div></div>
+      </div>
+
+      <!-- Solicitar Ajuda — Acesso Rápido -->
+      <div class="teacher-quick-link" onclick="showPage('teachers')">
+        <div class="teacher-quick-icon">👨‍🏫</div>
+        <div class="teacher-quick-text">
+          <div class="teacher-quick-title">Solicitar Ajuda de Professor</div>
+          <div class="teacher-quick-sub"><span class="online-dot"></span>3 professores online agora</div>
+        </div>
+        <div class="teacher-quick-arrow">›</div>
+      </div>
+    </div>
+
+    <!-- ──────────────── TUTOR IA ──────────────── -->
+    <!-- Nota: este page tem layout especial (flex coluna, sem padding) -->
+    <div class="page" id="page-tutor">
+      <!-- Chips de sessão -->
+      <div class="chat-sessions">
+        <button class="new-chat-chip" onclick="newChat()">+ Nova</button>
+        <div class="chat-chip active">Derivadas e integrais</div>
+        <div class="chat-chip">Lei de Newton</div>
+        <div class="chat-chip">Tabela periódica</div>
+        <div class="chat-chip">Fotossíntese</div>
+        <div class="chat-chip">Rev. Industrial</div>
+      </div>
+
+      <!-- Mensagens — scroll isolado -->
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg ai">
+          <div class="msg-av">🤖</div>
+          <div>
+            <div class="msg-bubble">Olá António! Sou o seu Tutor IA. Estou aqui para ajudá-lo com qualquer dúvida sobre as suas disciplinas. O que gostaria de estudar hoje?</div>
+            <div class="msg-time">09:00</div>
+          </div>
+        </div>
+        <div class="msg user">
+          <div class="msg-av">AK</div>
+          <div>
+            <div class="msg-bubble">Preciso de ajuda com derivadas. Não estou a perceber quando usar a regra da cadeia.</div>
+            <div class="msg-time">09:02</div>
+          </div>
+        </div>
+        <div class="msg ai">
+          <div class="msg-av">🤖</div>
+          <div>
+            <div class="msg-bubble">Boa questão! A <strong>regra da cadeia</strong> usa-se quando temos uma função composta.<br><br>
+              <strong>Fórmula:</strong> Se f(x) = g(h(x)), então f'(x) = g'(h(x)) · h'(x)<br><br>
+              <strong>Exemplo:</strong> f(x) = (3x² + 1)⁵<br>
+              f'(x) = 5(3x²+1)⁴ · 6x = 30x(3x²+1)⁴<br><br>
+              Quer mais exemplos?
+            </div>
+            <div class="msg-time">09:02</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input area — fica acima do teclado -->
+      <div class="chat-input-area" id="chat-input-area">
+        <div class="chat-actions">
+          <button class="chat-action-btn" onclick="sendQuick('Explica com mais detalhes')">💡 Mais detalhes</button>
+          <button class="chat-action-btn" onclick="sendQuick('Dá-me um exercício')">📝 Exercício</button>
+          <button class="chat-action-btn" onclick="sendQuick('Resume os pontos principais')">📋 Resumo</button>
+        </div>
+        <div class="chat-input-row">
+          <textarea class="chat-textarea" id="chat-input" rows="1" placeholder="Escreva a sua dúvida..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="chat-send" onclick="sendMessage()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────── EXAMES ──────────────── -->
+    <div class="page" id="page-exams">
+      <div class="page-header"><h1>📝 Exames</h1><p>Gere e realize exames personalizados</p></div>
+
+      <div class="exam-steps">
+        <div class="exam-step active" id="step1-tab"><span class="exam-step-num">1</span>Configurar</div>
+        <div class="exam-step" id="step2-tab"><span class="exam-step-num">2</span>Realizar</div>
+        <div class="exam-step" id="step3-tab"><span class="exam-step-num">3</span>Resultado</div>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="exam-step1">
+        <div class="card">
+          <div class="card-title">Configurar Novo Exame</div>
+          <div class="form-group"><label class="form-label">Disciplina</label><select class="form-select"><option>Matemática</option><option>Física</option><option>Química</option><option>Biologia</option><option>História</option><option>Português</option></select></div>
+          <div class="form-group"><label class="form-label">Tema</label><select class="form-select"><option>Todos os temas</option><option>Cálculo Diferencial</option><option>Álgebra Linear</option><option>Geometria</option><option>Probabilidade</option></select></div>
+          <div class="form-group"><label class="form-label">Número de Questões</label><select class="form-select"><option>5 questões</option><option>10 questões</option><option selected>15 questões</option><option>20 questões</option></select></div>
+          <div class="form-group"><label class="form-label">Tempo Limite</label><select class="form-select"><option>15 minutos</option><option>30 minutos</option><option selected>45 minutos</option><option>60 minutos</option></select></div>
+          <div class="form-group">
+            <label class="form-label">Nível de Dificuldade</label>
+            <div class="diff-btns">
+              <button class="diff-btn easy active" onclick="selectDiff(this)">🟢 Fácil</button>
+              <button class="diff-btn med" onclick="selectDiff(this)">🟡 Médio</button>
+              <button class="diff-btn hard" onclick="selectDiff(this)">🔴 Difícil</button>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="startExam()">⚡ Gerar Exame com IA</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Exames Recentes</div>
+          <div class="rank-table" style="margin-bottom:0">
+            <div class="recent-row"><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">Matemática — Álgebra</div><div style="font-size:11px;color:var(--text3);margin-top:2px">15 questões · 45min</div></div><div style="font-family:var(--font-head);color:var(--accent);font-weight:700;font-size:15px">92%</div><div style="font-size:10px;color:var(--text3);margin-left:10px">há 2h</div></div>
+            <div class="recent-row"><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">Física — Mecânica</div><div style="font-size:11px;color:var(--text3);margin-top:2px">10 questões · 30min</div></div><div style="font-family:var(--font-head);color:var(--accent2);font-weight:700;font-size:15px">78%</div><div style="font-size:10px;color:var(--text3);margin-left:10px">ontem</div></div>
+            <div class="recent-row"><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">Química — Orgânica</div><div style="font-size:11px;color:var(--text3);margin-top:2px">20 questões · 60min</div></div><div style="font-family:var(--font-head);color:var(--danger);font-weight:700;font-size:15px">65%</div><div style="font-size:10px;color:var(--text3);margin-left:10px">3 dias</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="exam-step2" style="display:none">
+        <div class="exam-header">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Matemática — Álgebra</div><div style="font-size:13px;color:var(--text2)">Questão <strong id="q-current" style="color:var(--text)">1</strong> de <span id="q-total">3</span></div></div>
+            <div class="exam-timer" id="exam-timer">44:30</div>
+          </div>
+          <div class="exam-progress-bar"><div class="exam-progress-fill" id="exam-fill" style="width:33%"></div></div>
+        </div>
+        <div id="exam-questions"></div>
+        <div class="exam-nav">
+          <button class="btn-sm ghost" id="btn-prev" onclick="prevQ()" style="display:none">← Anterior</button>
+          <button class="btn-sm primary" id="btn-next" onclick="nextQ()">Próxima →</button>
+          <button class="btn-submit" id="btn-submit" onclick="submitExam()" style="display:none">✓ Submeter</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="exam-step3" style="display:none">
+        <div class="result-header">
+          <div class="result-score good" id="result-score">87%</div>
+          <div style="font-family:var(--font-head);font-size:16px;margin-top:6px">Muito Bom! 🎉</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px">Matemática — Álgebra</div>
+        </div>
+        <div class="result-stats">
+          <div class="result-stat"><div class="result-stat-val" style="color:var(--accent)" id="res-correct">0</div><div class="result-stat-label">Corretas</div></div>
+          <div class="result-stat"><div class="result-stat-val" style="color:var(--danger)" id="res-wrong">0</div><div class="result-stat-label">Erradas</div></div>
+          <div class="result-stat"><div class="result-stat-val" style="color:var(--text2)">12:34</div><div class="result-stat-label">Tempo</div></div>
+        </div>
+        <div class="card"><div class="card-title">Revisão das Questões</div><div id="result-review"></div></div>
+        <div style="display:flex;gap:8px;margin-top:4px;padding-bottom:8px">
+          <button class="btn-primary" style="flex:1" onclick="showExamStep(1)">🔄 Refazer</button>
+          <button class="btn-sm ghost" style="padding:15px 16px" onclick="showPage('competitions')">⚔️ Desafiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────── COMPETIÇÕES ──────────────── -->
+    <div class="page" id="page-competitions">
+      <div class="page-header"><h1>⚔️ Competições</h1><p>Desafie outros estudantes e suba no ranking</p></div>
+      <div class="comp-tabs">
+        <div class="comp-tab active" onclick="compTab(this,'duels')">Duelos 1v1</div>
+        <div class="comp-tab" onclick="compTab(this,'group')">Grupos</div>
+        <div class="comp-tab" onclick="compTab(this,'global')">Global</div>
+      </div>
+
+      <div id="comp-duels">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="btn-sm primary" onclick="alert('A procurar adversário...')">⚔️ Novo Duelo</button>
+          <button class="btn-sm ghost" onclick="alert('Cole o código do adversário')">🔗 Por Código</button>
+        </div>
+        <div class="duel-card active-duel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--primary2)">🔴 AO VIVO</div>
+            <div style="font-size:10px;color:var(--text3)">Matemática · Difícil</div>
+          </div>
+          <div class="duel-players">
+            <div class="duel-player"><div class="duel-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div><div><div class="duel-name">Você</div><div style="font-size:10px;color:var(--text3)">Questão 8/15</div></div></div>
+            <div style="text-align:center"><div class="duel-score-big"><span style="color:var(--accent)">6</span> <span style="color:var(--text3);font-size:15px">–</span> <span style="color:var(--danger)">5</span></div><div class="vs-badge" style="margin-top:4px">VS</div></div>
+            <div class="duel-player right"><div class="duel-av" style="background:linear-gradient(135deg,#F5A623,#F55B7A);color:#fff">CS</div><div style="text-align:right"><div class="duel-name">Carlos S.</div><div style="font-size:10px;color:var(--text3)">Questão 8/15</div></div></div>
+          </div>
+          <div class="duel-actions">
+            <button class="btn-sm primary" onclick="alert('A abrir duelo...')">▶ Continuar</button>
+            <button class="btn-sm danger">Abandonar</button>
+          </div>
+        </div>
+        <div class="duel-card">
+          <div class="duel-players">
+            <div class="duel-player"><div class="duel-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div><div><div class="duel-name">Você</div></div></div>
+            <div style="text-align:center"><div class="duel-score-big" style="color:var(--accent)">WIN</div><div class="vs-badge" style="margin-top:4px">VS</div></div>
+            <div class="duel-player right"><div class="duel-av" style="background:linear-gradient(135deg,#9B59B6,#3498DB);color:#fff">MJ</div><div style="text-align:right"><div class="duel-name">Maria J.</div></div></div>
+          </div>
+          <div class="duel-meta"><span>Física · Médio</span><span>•</span><span>92% vs 78%</span><span>•</span><span>há 2h</span></div>
+          <div class="duel-actions">
+            <button class="btn-sm ghost" onclick="alert('Revancha criada!')">🔄 Revancha</button>
+            <button class="btn-sm ghost">📊 Detalhes</button>
+          </div>
+        </div>
+        <div class="duel-card">
+          <div style="font-size:11px;color:var(--accent2);margin-bottom:8px;font-weight:600">⏳ AGUARDANDO</div>
+          <div class="duel-players">
+            <div class="duel-player"><div class="duel-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div><div><div class="duel-name">Você</div></div></div>
+            <div class="vs-badge">VS</div>
+            <div class="duel-player right"><div class="duel-av" style="background:linear-gradient(135deg,#27AE60,#2ECC71);color:#fff">TM</div><div style="text-align:right"><div class="duel-name">Tiago M.</div></div></div>
+          </div>
+          <div class="duel-meta"><span>Química · Fácil</span><span>•</span><span>enviado há 1h</span></div>
+          <button class="btn-sm ghost">Cancelar Convite</button>
+        </div>
+      </div>
+
+      <div id="comp-group" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="btn-sm primary">+ Criar Grupo</button>
+          <button class="btn-sm ghost">Entrar com Código</button>
+        </div>
+        <div class="duel-card">
+          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">
+            <div><div style="font-weight:700;font-size:14px">🏫 Turma 12ºA</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Prof. João Neto · 28 membros</div></div>
+            <div style="background:rgba(0,201,167,.15);color:var(--accent);font-size:10px;padding:3px 8px;border-radius:8px;font-weight:600">Activo</div>
+          </div>
+          <div class="rank-table" style="margin-bottom:0">
+            <div class="rank-row me"><div class="rank-pos gold">1</div><div class="rank-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div><div class="rank-name">Você <span class="rank-badge">+12</span></div><div class="rank-pts">1847</div></div>
+            <div class="rank-row"><div class="rank-pos silver">2</div><div class="rank-av" style="background:#9B59B6;color:#fff">MJ</div><div class="rank-name">Maria J.</div><div class="rank-pts">1723</div></div>
+            <div class="rank-row"><div class="rank-pos bronze">3</div><div class="rank-av" style="background:#F5A623;color:var(--bg)">TM</div><div class="rank-name">Tiago M.</div><div class="rank-pts">1650</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="comp-global" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="duel-card" style="text-align:center;cursor:pointer" onclick="showPage('rankings')">
+            <div style="font-size:26px;margin-bottom:6px">🌍</div>
+            <div style="font-weight:700;font-size:13px">Ranking Global</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">4.2k alunos</div>
+            <div style="font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--accent);margin-top:8px">#12</div>
+          </div>
+          <div class="duel-card" style="text-align:center;cursor:pointer">
+            <div style="font-size:26px;margin-bottom:6px">⚡</div>
+            <div style="font-weight:700;font-size:13px">Torneio Relâmpago</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">10 min · Ao vivo</div>
+            <div style="font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--accent2);margin-top:8px">18:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────── PROFESSORES ──────────────── -->
+    <div class="page" id="page-teachers">
+      <div class="page-header"><h1>👨‍🏫 Professores</h1><p>Solicite ajuda personalizada de especialistas</p></div>
+
+      <!-- Tabs: Aluno vê Explorar + Minhas Aulas | Professor vê Solicitações -->
+      <div class="teacher-tabs" id="teacher-tabs">
+        <div class="teacher-tab active" id="tab-explore" onclick="teacherTab('explore')">🔍 Explorar</div>
+        <div class="teacher-tab" id="tab-my-lessons" onclick="teacherTab('my-lessons')">📋 Minhas Aulas <span id="lessons-badge" style="display:none;background:var(--danger);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:4px">2</span></div>
+        <div class="teacher-tab" id="tab-requests" onclick="teacherTab('requests')" style="display:none">📩 Solicitações <span style="background:var(--danger);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:4px">2</span></div>
+      </div>
+
+      <!-- Saldo do aluno -->
+      <div id="teacher-balance" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--text2)">Especialistas prontos para te ajudar</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--primary2)">Saldo: 850 MT</div>
+      </div>
+
+      <!-- VIEW: EXPLORAR PROFESSORES (aluno) -->
+      <div id="teacher-explore">
+
+        <!-- Prof 1: online -->
+        <div class="teacher-card">
+          <div class="teacher-card-body">
+            <div style="position:relative">
+              <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#5B6EF5,#00C9A7);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff">JM</div>
+              <div class="teacher-status-dot online"></div>
+            </div>
+            <div class="teacher-info">
+              <div class="teacher-name">Prof. João Machava</div>
+              <div class="teacher-subject">Matemática &amp; Física</div>
+              <div class="teacher-meta">
+                <div class="teacher-rating">⭐ 4.9</div>
+                <span style="color:var(--border2)">·</span>
+                <span>5 anos exp.</span>
+                <span style="color:var(--border2)">·</span>
+                <span style="color:var(--accent)">● Online</span>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div class="teacher-price">150 MT</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px">/aula</div>
+            </div>
+          </div>
+          <div class="teacher-actions">
+            <button class="btn-sm ghost" onclick="alert('Perfil do professor')">Ver Perfil</button>
+            <button class="btn-sm primary" onclick="openRequestModal('João Machava','Matemática & Física',150)">Solicitar Ajuda</button>
+          </div>
+        </div>
+
+        <!-- Prof 2: online -->
+        <div class="teacher-card">
+          <div class="teacher-card-body">
+            <div style="position:relative">
+              <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#F5A623,#F55B7A);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff">AF</div>
+              <div class="teacher-status-dot online"></div>
+            </div>
+            <div class="teacher-info">
+              <div class="teacher-name">Profa. Ana Fumo</div>
+              <div class="teacher-subject">Química &amp; Biologia</div>
+              <div class="teacher-meta">
+                <div class="teacher-rating">⭐ 4.7</div>
+                <span style="color:var(--border2)">·</span>
+                <span>3 anos exp.</span>
+                <span style="color:var(--border2)">·</span>
+                <span style="color:var(--accent)">● Online</span>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div class="teacher-price">120 MT</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px">/aula</div>
+            </div>
+          </div>
+          <div class="teacher-actions">
+            <button class="btn-sm ghost" onclick="alert('Perfil da professora')">Ver Perfil</button>
+            <button class="btn-sm primary" onclick="openRequestModal('Ana Fumo','Química & Biologia',120)">Solicitar Ajuda</button>
+          </div>
+        </div>
+
+        <!-- Prof 3: offline -->
+        <div class="teacher-card" style="opacity:.65">
+          <div class="teacher-card-body">
+            <div style="position:relative">
+              <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#252A45,#1a1f38);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#5A6494">CN</div>
+              <div class="teacher-status-dot offline"></div>
+            </div>
+            <div class="teacher-info">
+              <div class="teacher-name">Prof. Carlos Neto</div>
+              <div class="teacher-subject">História &amp; Português</div>
+              <div class="teacher-meta">
+                <div class="teacher-rating">⭐ 4.5</div>
+                <span style="color:var(--border2)">·</span>
+                <span>7 anos exp.</span>
+                <span style="color:var(--border2)">·</span>
+                <span style="color:var(--text3)">● Offline</span>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:12px;font-weight:700;color:var(--text3)">200 MT</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px">/aula</div>
+            </div>
+          </div>
+          <div class="teacher-actions">
+            <button class="btn-sm ghost">Ver Perfil</button>
+            <button class="btn-sm ghost" disabled style="cursor:not-allowed">Indisponível</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VIEW: MINHAS AULAS (aluno) -->
+      <div id="teacher-my-lessons" style="display:none">
+
+        <!-- Aula pendente -->
+        <div class="request-card">
+          <div class="request-header">
+            <div class="request-info">
+              <div class="request-subject">Matemática</div>
+              <div class="request-from">Com: Prof. João Machava</div>
+            </div>
+            <div class="request-status pending">PENDENTE</div>
+          </div>
+          <div class="request-desc">"Preciso de ajuda com integrais por partes. Não estou percebendo quando aplicar a fórmula."</div>
+          <div class="request-footer">
+            <div class="request-price">150 MT</div>
+            <div class="request-actions">
+              <button class="btn-sm danger" onclick="alert('Solicitação cancelada!')">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aula aceite -->
+        <div class="request-card">
+          <div class="request-header">
+            <div class="request-info">
+              <div class="request-subject">Química Orgânica</div>
+              <div class="request-from">Com: Profa. Ana Fumo</div>
+            </div>
+            <div class="request-status accepted">ACEITE</div>
+          </div>
+          <div class="request-desc">"Dificuldade com reações de substituição nucleofílica - SN1 e SN2."</div>
+          <div class="request-footer">
+            <div class="request-price">120 MT</div>
+            <div class="request-actions">
+              <button class="btn-sm primary" onclick="alert('A abrir sala de aula...')">🎥 Entrar na Sala</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aula concuída — com botão de Avaliar -->
+        <div class="request-card" id="completed-lesson-card">
+          <div class="request-header">
+            <div class="request-info">
+              <div class="request-subject">Física — Mecânica</div>
+              <div class="request-from">Com: Prof. João Machava</div>
+            </div>
+            <div class="request-status completed">CONCLUÍDA</div>
+          </div>
+          <!-- Banner de avaliação pendente -->
+          <div id="rate-banner" style="background:linear-gradient(135deg,rgba(245,166,35,.12),rgba(245,91,122,.08));border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">⭐</span>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">Avalie o professor!</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:1px">A sua opinião ajuda outros alunos.</div>
+            </div>
+          </div>
+          <div class="request-footer">
+            <div class="request-price">150 MT</div>
+            <div class="request-actions">
+              <button class="btn-sm" id="rate-done-badge" style="display:none;background:rgba(0,201,167,.15);color:var(--accent);border:1px solid rgba(0,201,167,.3);cursor:default">✓ Avaliado</button>
+              <button class="btn-sm" style="background:var(--accent2);color:var(--bg);font-weight:700" onclick="openRatingModal('João Machava','Física — Mecânica')" id="rate-open-btn">⭐ Avaliar</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VIEW: SOLICITAÇÕES RECEBIDAS (professor) -->
+      <div id="teacher-requests" style="display:none">
+        <!-- Painel de status do professor -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Meu Status</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">Visível para alunos como disponível</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:11px;color:var(--accent);font-weight:600"><span class="online-dot"></span>Online</span>
+            <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');toggleTeacherStatus(this)"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <!-- Solicitação 1 -->
+        <div class="request-card">
+          <div class="request-header">
+            <div class="request-info">
+              <div class="request-subject">Matemática</div>
+              <div class="request-from">De: António Kumbe · há 5 min</div>
+            </div>
+            <div class="request-status pending">PENDENTE</div>
+          </div>
+          <div class="request-desc">"Preciso de ajuda com integrais por partes. Não estou percebendo quando aplicar a fórmula."</div>
+          <div class="request-footer">
+            <div class="request-price">150 MT</div>
+            <div class="request-actions">
+              <button class="btn-sm danger" onclick="handleLessonReject(this)">Recusar</button>
+              <button class="btn-sm" style="background:var(--accent);color:var(--bg)" onclick="handleLessonAccept(this)">Aceitar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Solicitação 2 -->
+        <div class="request-card">
+          <div class="request-header">
+            <div class="request-info">
+              <div class="request-subject">Física — Dinâmica</div>
+              <div class="request-from">De: Maria Jone · há 18 min</div>
+            </div>
+            <div class="request-status pending">PENDENTE</div>
+          </div>
+          <div class="request-desc">"Tenho dúvida nas leis de Newton — especificamente a 3ª lei. Preciso de exemplos práticos."</div>
+          <div class="request-footer">
+            <div class="request-price">150 MT</div>
+            <div class="request-actions">
+              <button class="btn-sm danger" onclick="handleLessonReject(this)">Recusar</button>
+              <button class="btn-sm" style="background:var(--accent);color:var(--bg)" onclick="handleLessonAccept(this)">Aceitar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aula em andamento -->
+        <div class="request-card">
+          <div class="request-header">
+            <div class="request-info">
+              <div class="request-subject">Química Orgânica</div>
+              <div class="request-from">De: Tiago Mota · aceite hoje</div>
+            </div>
+            <div class="request-status accepted">EM CURSO</div>
+          </div>
+          <div class="request-footer">
+            <div class="request-price">120 MT</div>
+            <div class="request-actions">
+              <button class="btn-sm primary" onclick="alert('A abrir sala...')">🎥 Entrar</button>
+              <button class="btn-sm ghost" onclick="alert('Aula finalizada! Pagamento liberado.')">Finalizar</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Modal de Confirmação de Pedido de Ajuda -->
+    <div class="teacher-modal-overlay" id="request-modal" onclick="closeRequestModal(event)">
+      <div class="teacher-modal-panel" onclick="event.stopPropagation()">
+        <div class="teacher-modal-handle"></div>
+        <div class="teacher-modal-title">Confirmar Aula</div>
+        <div class="teacher-modal-info">
+          <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff" id="modal-av">JM</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700;color:var(--text)" id="modal-name">Prof. João Machava</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px" id="modal-subject">Matemática & Física</div>
+          </div>
+          <div style="font-size:18px;font-weight:800;color:var(--accent)" id="modal-price">150 MT</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">O que você quer aprender?</label>
+          <textarea class="form-textarea" id="modal-desc" placeholder="Ex: Preciso de ajuda com equações diferenciais..."></textarea>
+        </div>
+        <div class="security-note">
+          <span style="font-size:20px">🛡️</span>
+          <span>Segurança SophIA: O valor será retido e só transferido ao professor após confirmar a conclusão da aula.</span>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:18px">
+          <button class="btn-sm ghost" style="flex:1;padding:15px" onclick="closeRequestModal(null)">Voltar</button>
+          <button class="btn-primary" style="flex:2" onclick="submitHelpRequest()">Confirmar Agora</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MODAL: AVALIAR PROFESSOR ══ -->
+    <div class="rating-modal-overlay" id="rating-modal" onclick="closeRatingModal(event)">
+      <div class="rating-modal-box" onclick="event.stopPropagation()">
+        <div class="rating-av-big" id="rating-av">JM</div>
+        <div class="rating-title">Como foi a aula?</div>
+        <div class="rating-sub" id="rating-sub">Avalie o Prof. João Machava<br>em Física — Mecânica</div>
+
+        <!-- Estrelas -->
+        <div class="stars-row" id="stars-row">
+          <span class="star-btn" data-val="1" onclick="selectStar(1)">⭐</span>
+          <span class="star-btn" data-val="2" onclick="selectStar(2)">⭐</span>
+          <span class="star-btn" data-val="3" onclick="selectStar(3)">⭐</span>
+          <span class="star-btn" data-val="4" onclick="selectStar(4)">⭐</span>
+          <span class="star-btn" data-val="5" onclick="selectStar(5)">⭐</span>
+        </div>
+        <div class="rating-label" id="rating-label">Toque numa estrela</div>
+
+        <!-- Chips rápidos -->
+        <div class="rating-chips" id="rating-chips">
+          <div class="rating-chip" onclick="toggleChip(this)">Explica bem</div>
+          <div class="rating-chip" onclick="toggleChip(this)">Muito paciente</div>
+          <div class="rating-chip" onclick="toggleChip(this)">Pontual</div>
+          <div class="rating-chip" onclick="toggleChip(this)">Domina o tema</div>
+          <div class="rating-chip" onclick="toggleChip(this)">Exemplos práticos</div>
+          <div class="rating-chip" onclick="toggleChip(this)">Recomendo!</div>
+        </div>
+
+        <!-- Comentário -->
+        <textarea class="rating-textarea" id="rating-comment" placeholder="Comente a sua experiência (opcional)..."></textarea>
+
+        <div class="rating-actions">
+          <button class="btn-sm ghost" onclick="closeRatingModal(null)">Agora não</button>
+          <button class="btn-sm primary" onclick="submitRating()" style="flex:2;background:var(--accent2);color:var(--bg)">Enviar Avaliação</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────── RANKINGS ──────────────── -->
+    <div class="page" id="page-rankings">
+      <div class="page-header"><h1>🏆 Rankings</h1><p>Classificação global dos melhores estudantes</p></div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <select class="form-select" style="font-size:12px;padding:9px 11px"><option>Todas as Disciplinas</option><option>Matemática</option><option>Física</option><option>Química</option></select>
+        <select class="form-select" style="font-size:12px;padding:9px 11px"><option>Esta Semana</option><option>Este Mês</option><option>Geral</option></select>
+      </div>
+      <div class="top3-row">
+        <div class="top3-card silver">
+          <div style="font-size:22px">🥈</div>
+          <div class="rank-av" style="width:38px;height:38px;background:linear-gradient(135deg,#A8A8A8,#888);color:#fff;margin:7px auto;font-size:12px">JP</div>
+          <div style="font-weight:700;font-size:12px">João P.</div>
+          <div style="font-size:10px;color:var(--text3)">Maputo</div>
+          <div style="font-family:var(--font-head);font-size:16px;font-weight:800;color:#A8A8A8;margin-top:5px">2180</div>
+        </div>
+        <div class="top3-card first">
+          <div style="font-size:28px">🥇</div>
+          <div class="rank-av" style="width:44px;height:44px;background:linear-gradient(135deg,#F5C518,#E8A200);color:var(--bg);font-size:15px;margin:7px auto">LM</div>
+          <div style="font-weight:700;font-size:13px">Luisa M.</div>
+          <div style="font-size:10px;color:var(--text3)">Luanda</div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;color:#F5C518;margin-top:5px">2340</div>
+        </div>
+        <div class="top3-card bronze">
+          <div style="font-size:22px">🥉</div>
+          <div class="rank-av" style="width:38px;height:38px;background:linear-gradient(135deg,#CD7F32,#A0522D);color:#fff;margin:7px auto;font-size:12px">AF</div>
+          <div style="font-weight:700;font-size:12px">Ana F.</div>
+          <div style="font-size:10px;color:var(--text3)">Beira</div>
+          <div style="font-family:var(--font-head);font-size:16px;font-weight:800;color:#CD7F32;margin-top:5px">2050</div>
+        </div>
+      </div>
+      <div class="rank-table">
+        <div class="rank-row" style="padding:8px 14px;background:var(--bg3)"><span style="font-size:10px;color:var(--text3);width:26px">Pos</span><span style="width:34px"></span><span style="flex:1;font-size:10px;color:var(--text3)">Estudante</span><span style="font-size:10px;color:var(--text3)">Pts</span></div>
+        <div class="rank-row"><div class="rank-pos" style="color:var(--text3)">4</div><div class="rank-av" style="background:#3498DB;color:#fff">RN</div><div class="rank-name">Rafael N.<div class="rank-sub">Nampula · 45 exames</div></div><div class="rank-pts">1980</div></div>
+        <div class="rank-row"><div class="rank-pos" style="color:var(--text3)">5</div><div class="rank-av" style="background:#E74C3C;color:#fff">CS</div><div class="rank-name">Cláudia S.<div class="rank-sub">Maputo · 38 exames</div></div><div class="rank-pts">1920</div></div>
+        <div class="rank-row" style="justify-content:center;font-size:14px;color:var(--text3)">…</div>
+        <div class="rank-row me" style="border:1px solid rgba(91,110,245,.25);margin:4px 8px;border-radius:10px;padding:10px 10px">
+          <div class="rank-pos" style="color:var(--primary2)">12</div>
+          <div class="rank-av" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff">AK</div>
+          <div class="rank-name">Você <span class="rank-badge">A sua posição</span><div class="rank-sub">Maputo · 34 exames</div></div>
+          <div class="rank-pts">1847</div>
+        </div>
+        <div class="rank-row"><div class="rank-pos" style="color:var(--text3)">13</div><div class="rank-av" style="background:#1ABC9C;color:#fff">BM</div><div class="rank-name">Bruno M.<div class="rank-sub">Gaza · 29 exames</div></div><div class="rank-pts">1830</div></div>
+        <div class="rank-row"><div class="rank-pos" style="color:var(--text3)">14</div><div class="rank-av" style="background:#9B59B6;color:#fff">FM</div><div class="rank-name">Fátima M.<div class="rank-sub">Inhambane · 31 exames</div></div><div class="rank-pts">1798</div></div>
+      </div>
+    </div>
+
+    <!-- ──────────────── PERFIL ──────────────── -->
+    <div class="page" id="page-profile">
+      <div class="page-header"><h1>👤 Perfil</h1><p>Configurações e conquistas</p></div>
+      <div class="profile-header">
+        <div class="profile-av">AK</div>
+        <div class="profile-name">António Kumbe</div>
+        <div class="profile-email">antonio.kumbe@email.com</div>
+        <div style="margin-top:8px;display:flex;justify-content:center;gap:8px">
+          <span class="badge active" style="padding:3px 10px;font-size:11px">Pro</span>
+          <span style="font-size:11px;color:var(--text3);align-self:center">Membro desde Jan 2025</span>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat"><div class="profile-stat-val" style="color:var(--accent)">87%</div><div class="profile-stat-label">Média</div></div>
+          <div class="profile-stat"><div class="profile-stat-val">34</div><div class="profile-stat-label">Exames</div></div>
+          <div class="profile-stat"><div class="profile-stat-val" style="color:var(--accent2)">8</div><div class="profile-stat-label">Duelos</div></div>
+          <div class="profile-stat"><div class="profile-stat-val" style="color:var(--primary2)">#12</div><div class="profile-stat-label">Ranking</div></div>
+        </div>
+        <button class="btn-sm ghost" style="margin-top:14px;padding:10px 24px" onclick="alert('Editar perfil')">✏️ Editar Perfil</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">Conquistas</div>
+        <div class="achievements-grid">
+          <div class="achievement"><div class="achievement-icon">🔥</div><div class="achievement-name">7 dias seguidos</div></div>
+          <div class="achievement"><div class="achievement-icon">💯</div><div class="achievement-name">Nota perfeita</div></div>
+          <div class="achievement"><div class="achievement-icon">⚔️</div><div class="achievement-name">10 duelos</div></div>
+          <div class="achievement"><div class="achievement-icon">📚</div><div class="achievement-name">30 exames</div></div>
+          <div class="achievement locked"><div class="achievement-icon">🌟</div><div class="achievement-name">Top 10 global</div></div>
+          <div class="achievement locked"><div class="achievement-icon">👑</div><div class="achievement-name">50 vitórias</div></div>
+          <div class="achievement locked"><div class="achievement-icon">🎯</div><div class="achievement-name">Mestre Mat.</div></div>
+          <div class="achievement locked"><div class="achievement-icon">🚀</div><div class="achievement-name">100 exames</div></div>
+        </div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">Configurações</div>
+        <div class="toggle-row"><span style="font-size:13px;color:var(--text2)">Notificações por email</span><div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><span style="font-size:13px;color:var(--text2)">Desafios de duelo</span><div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><span style="font-size:13px;color:var(--text2)">Modo escuro</span><div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div></div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">Plano Actual</div>
+        <div style="background:linear-gradient(135deg,rgba(91,110,245,.15),rgba(0,201,167,.1));border:1px solid rgba(91,110,245,.3);border-radius:12px;padding:15px">
+          <div style="font-family:var(--font-head);font-size:16px;font-weight:700">Pro Plan</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px">Exames ilimitados · Tutor IA avançado · Competições premium</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px">Renova em 15 Jun 2025</div>
+        </div>
+        <button class="btn-sm ghost" style="width:100%;margin-top:10px;padding:12px">Gerir Subscrição</button>
+      </div>
+      <!-- Admin acessível via perfil -->
+      <div class="admin-card" onclick="openMore()" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:16px">
+        <span style="font-size:22px">🏫</span>
+        <div style="flex:1"><div style="font-size:14px;font-weight:600">Administração</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Turmas, alunos e relatórios</div></div>
+        <span style="color:var(--text3);font-size:18px">›</span>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- ══ BOTTOM NAV — 5 itens ══ -->
+  <div class="bottom-nav" id="bottom-nav">
+    <div class="nav-item active" data-page="dashboard">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Início</span>
+    </div>
+    <div class="nav-item" data-page="tutor">
+      <span class="nav-icon">🤖</span>
+      <span class="nav-label">Tutor IA</span>
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" data-page="exams">
+      <span class="nav-icon">📝</span>
+      <span class="nav-label">Exames</span>
+    </div>
+    <div class="nav-item" data-page="teachers">
+      <span class="nav-icon">👨‍🏫</span>
+      <span class="nav-label">Professores</span>
+      <span class="nav-badge">2</span>
+    </div>
+    <div class="nav-item" data-page="rankings">
+      <span class="nav-icon">🏆</span>
+      <span class="nav-label">Rankings</span>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ══ BOTTOM SHEET: NOTIFICAÇÕES ══ -->
+<div class="sheet" id="notif-sheet">
+  <div class="sheet-backdrop" onclick="closeSheet('notif-sheet')"></div>
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">Notificações</div>
+      <div class="sheet-close" onclick="closeSheet('notif-sheet')">Marcar lidas ✓</div>
+    </div>
+    <div class="sheet-body">
+      <div class="notif-item unread"><div class="notif-dot2"></div><div><div class="notif-text"><strong>Duelo aceite!</strong> Carlos Silva aceitou o seu desafio em Matemática</div><div class="notif-time">há 5 min</div></div></div>
+      <div class="notif-item unread"><div class="notif-dot2"></div><div><div class="notif-text"><strong>Novo ranking!</strong> Subiu para #12 em Física</div><div class="notif-time">há 1h</div></div></div>
+      <div class="notif-item"><div class="notif-dot2 empty"></div><div><div class="notif-text">Exame de <strong>Química</strong> disponível — Sem prazo definido</div><div class="notif-time">ontem</div></div></div>
+      <div class="notif-item"><div class="notif-dot2 empty"></div><div><div class="notif-text">O professor criou uma nova <strong>competição de turma</strong></div><div class="notif-time">há 2 dias</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MORE SHEET: ADMINISTRAÇÃO ══ -->
+<div class="more-sheet" id="more-sheet">
+  <div class="more-backdrop" onclick="closeMore()"></div>
+  <div class="more-panel">
+    <div class="more-handle"></div>
+    <div style="padding:0 16px 4px;font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text)">Administração</div>
+    <div style="font-size:12px;color:var(--text3);padding:2px 16px 14px">Gestão de turmas, alunos e relatórios</div>
+    <div class="more-grid">
+      <div class="more-item" onclick="closeMore();alert('A abrir turmas...')">
+        <div class="more-icon">🏫</div>
+        <div><div class="more-label">Turmas</div><div class="more-sub">6 activas</div></div>
+      </div>
+      <div class="more-item" onclick="closeMore();alert('A abrir alunos...')">
+        <div class="more-icon">👥</div>
+        <div><div class="more-label">Alunos</div><div class="more-sub">127 no total</div></div>
+      </div>
+      <div class="more-item" onclick="closeMore();alert('A abrir relatórios...')">
+        <div class="more-icon">📊</div>
+        <div><div class="more-label">Relatórios</div><div class="more-sub">Exportar PDF</div></div>
+      </div>
+      <div class="more-item" onclick="closeMore();alert('A criar exame de turma...')">
+        <div class="more-icon">📝</div>
+        <div><div class="more-label">Criar Exame</div><div class="more-sub">Para turma</div></div>
+      </div>
+    </div>
+    <div style="padding:8px 16px 0">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:13px;font-weight:600">Média da escola</div><div style="font-size:11px;color:var(--text3);margin-top:2px">843 exames realizados</div></div>
+        <div style="font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--accent)">81%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── NAVEGAÇÃO ────────────────────────────────────────────────────────────
+const pageNames={dashboard:'ExamAI Pro',tutor:'Tutor IA',exams:'Exames',competitions:'Competições',rankings:'Rankings',profile:'Perfil',teachers:'Professores'};
+
+function showPage(p){
+  // fechar sheets
+  document.querySelectorAll('.sheet,.more-sheet').forEach(s=>s.classList.remove('open'));
+
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+
+  const pg=document.getElementById('page-'+p);
+  if(pg) pg.classList.add('active');
+
+  const ni=document.querySelector(`.nav-item[data-page="${p}"]`);
+  if(ni) ni.classList.add('active');
+
+  document.getElementById('topbar-title').textContent=pageNames[p]||p;
+
+  // scroll to top — só no content, nunca no chat
+  if(p!=='tutor') document.getElementById('main-content').scrollTop=0;
+}
+
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>showPage(el.dataset.page));
+});
+
+// ─── BOTTOM SHEETS ────────────────────────────────────────────────────────
+function openSheet(id){document.getElementById(id).classList.add('open')}
+function closeSheet(id){document.getElementById(id).classList.remove('open')}
+function openMore(){document.getElementById('more-sheet').classList.add('open')}
+function closeMore(){document.getElementById('more-sheet').classList.remove('open')}
+
+// fechar sheets ao tocar no backdrop
+document.querySelectorAll('.sheet-backdrop,.more-backdrop').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.sheet,.more-sheet').forEach(s=>s.classList.remove('open'));
+  });
+});
+
+// ─── TECLADO VIRTUAL — visualViewport API ─────────────────────────────────
+// Corrige o problema crítico: input escondido atrás do teclado iOS/Android
+(function(){
+  const inputArea=document.getElementById('chat-input-area');
+  if(!window.visualViewport) return;
+
+  let rafId=null;
+  function onVPChange(){
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId=requestAnimationFrame(()=>{
+      const vp=window.visualViewport;
+      const windowH=window.innerHeight;
+      const keyboardH=Math.max(0, windowH - vp.height - vp.offsetTop);
+      // Empurra o input-area acima do teclado
+      inputArea.style.paddingBottom=(keyboardH > 10 ? keyboardH + 10 : 10 + getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom').replace('px','')||0) + 'px';
+      // Mantém scroll das mensagens visível
+      if(keyboardH > 10){
+        const msgs=document.getElementById('chat-messages');
+        msgs.scrollTop=msgs.scrollHeight;
+      }
+    });
+  }
+
+  window.visualViewport.addEventListener('resize', onVPChange);
+  window.visualViewport.addEventListener('scroll', onVPChange);
+})();
+
+// ─── AUTO-RESIZE TEXTAREA ─────────────────────────────────────────────────
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,90)+'px';
+}
+
+// ─── TUTOR IA ─────────────────────────────────────────────────────────────
+const aiResponses=[
+  "Óptima pergunta! Vamos explorar isso juntos. O conceito que mencionou é fundamental para compreender os temas mais avançados.",
+  "Exactamente! Deixe-me explicar com um exemplo prático que vai tornar este conceito muito mais claro.",
+  "Isso é uma confusão muito comum. A diferença principal é que... vamos ver passo a passo.",
+  "Perfeito! Para praticar este conceito, sugiro o seguinte exercício: resolva este problema usando o método que discutimos.",
+  "Com base no seu desempenho, recomendo focar neste subtema. Quer que eu crie exercícios personalizados?"
+];
+let aiIdx=0;
+function getTime(){const d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+
+function appendMsg(role,text){
+  const msgs=document.getElementById('chat-messages');
+  const av=role==='user'?'AK':'🤖';
+  const cls=role==='user'?'user':'ai';
+  const m=document.createElement('div');
+  m.className='msg '+cls;
+  m.innerHTML=`<div class="msg-av">${av}</div><div><div class="msg-bubble">${text}</div><div class="msg-time">${getTime()}</div></div>`;
+  msgs.appendChild(m);
+  // scroll suave
+  requestAnimationFrame(()=>msgs.scrollTo({top:msgs.scrollHeight,behavior:'smooth'}));
+}
+
+function sendMessage(){
+  const inp=document.getElementById('chat-input');
+  const txt=inp.value.trim();
+  if(!txt) return;
+  appendMsg('user',txt);
+  inp.value='';inp.style.height='auto';
+
+  // typing indicator
+  const msgs=document.getElementById('chat-messages');
+  const typing=document.createElement('div');
+  typing.className='msg ai';typing.id='typing-indicator';
+  typing.innerHTML='<div class="msg-av">🤖</div><div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>';
+  msgs.appendChild(typing);
+  msgs.scrollTo({top:msgs.scrollHeight,behavior:'smooth'});
+
+  setTimeout(()=>{
+    const t=document.getElementById('typing-indicator');
+    if(t) t.remove();
+    appendMsg('ai',aiResponses[aiIdx%aiResponses.length]);
+    aiIdx++;
+  },1400);
+}
+
+function sendQuick(t){
+  document.getElementById('chat-input').value=t;
+  sendMessage();
+}
+
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+}
+
+function newChat(){
+  document.getElementById('chat-messages').innerHTML=
+    `<div class="msg ai"><div class="msg-av">🤖</div><div><div class="msg-bubble">Olá! Nova conversa iniciada. O que gostaria de estudar?</div><div class="msg-time">${getTime()}</div></div></div>`;
+}
+
+// ─── EXAMES ───────────────────────────────────────────────────────────────
+const questions=[
+  {q:'Qual é a derivada de f(x) = x³ + 2x² − 5x + 3?',opts:['3x² + 4x − 5','3x² + 4x + 5','x² + 4x − 5','3x + 4 − 5'],correct:0,exp:'Pela regra da potência d/dx(xⁿ)=nxⁿ⁻¹, aplicando a cada termo: 3x² + 4x − 5.'},
+  {q:'Para que valor de x a função f(x) = x² − 6x + 8 tem mínimo?',opts:['x = 2','x = 3','x = 4','x = 6'],correct:1,exp:'O mínimo ocorre em x = −b/2a = 6/2 = 3. Verificação: f\'(x)=2x−6=0 → x=3.'},
+  {q:'Qual é o resultado de ∫(2x + 3)dx?',opts:['x² + 3x + C','2x² + 3x + C','x² + 3 + C','2x + 3 + C'],correct:0,exp:'Integrando termo a termo: ∫2x dx = x² e ∫3 dx = 3x. Logo: x² + 3x + C.'},
+];
+let currentQ=0,userAnswers=[],timerInterval=null,totalSecs=2700;
+
+function selectDiff(el){
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function startExam(){
+  currentQ=0;userAnswers=new Array(questions.length).fill(null);
+  showExamStep(2);renderQuestion();startTimer();
+}
+
+function showExamStep(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('exam-step'+i).style.display=i===n?'block':'none';
+    const tab=document.getElementById('step'+i+'-tab');
+    tab.classList.toggle('active',i===n);
+    tab.classList.toggle('done',i<n);
+  });
+  document.getElementById('main-content').scrollTop=0;
+}
+
+function renderQuestion(){
+  const q=questions[currentQ];
+  document.getElementById('q-current').textContent=currentQ+1;
+  document.getElementById('q-total').textContent=questions.length;
+  document.getElementById('exam-fill').style.width=((currentQ+1)/questions.length*100)+'%';
+  const isLast=currentQ===questions.length-1;
+  const prev=document.getElementById('btn-prev');
+  const next=document.getElementById('btn-next');
+  const sub=document.getElementById('btn-submit');
+  prev.style.display=currentQ>0?'block':'none';
+  next.style.display=isLast?'none':'block';
+  sub.style.display=isLast?'block':'none';
+  document.getElementById('exam-questions').innerHTML=`
+    <div class="q-card">
+      <div class="q-badge">Questão ${currentQ+1} · Álgebra</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">
+        ${q.opts.map((o,i)=>`<div class="q-option${userAnswers[currentQ]===i?' selected':''}" onclick="selectOpt(${i})"><div class="opt-letter">${'ABCD'[i]}</div>${o}</div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function selectOpt(i){
+  userAnswers[currentQ]=i;
+  document.querySelectorAll('.q-option').forEach((el,idx)=>el.classList.toggle('selected',idx===i));
+}
+
+function nextQ(){if(currentQ<questions.length-1){currentQ++;renderQuestion();}}
+function prevQ(){if(currentQ>0){currentQ--;renderQuestion();}}
+
+function startTimer(){
+  if(timerInterval) clearInterval(timerInterval);
+  let s=totalSecs;
+  timerInterval=setInterval(()=>{
+    s--;
+    if(s<=0){clearInterval(timerInterval);submitExam();return;}
+    const m=Math.floor(s/60),sec=s%60;
+    document.getElementById('exam-timer').textContent=m+':'+(sec<10?'0':'')+sec;
+  },1000);
+}
+
+function submitExam(){
+  if(timerInterval) clearInterval(timerInterval);
+  let correct=0;
+  questions.forEach((q,i)=>{if(userAnswers[i]===q.correct) correct++;});
+  const pct=Math.round(correct/questions.length*100);
+  document.getElementById('result-score').textContent=pct+'%';
+  document.getElementById('result-score').className='result-score '+(pct>=80?'good':pct>=60?'ok':'bad');
+  document.getElementById('res-correct').textContent=correct;
+  document.getElementById('res-wrong').textContent=questions.length-correct;
+  document.getElementById('result-review').innerHTML=questions.map((q,i)=>{
+    const ua=userAnswers[i];const ok=ua===q.correct;
+    return `<div style="margin-bottom:10px;padding:12px;background:var(--bg3);border-radius:10px;border:1px solid ${ok?'rgba(0,201,167,.25)':'rgba(245,91,122,.25)'}">
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:${ok?'var(--accent)':'var(--danger)'}">${ok?'✓':'✗'} Questão ${i+1}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${q.q}</div>
+      <div style="font-size:11px">Sua resposta: <strong style="color:${ok?'var(--accent)':'var(--danger)'}">${ua!==null?'ABCD'[ua]+') '+q.opts[ua]:'Não respondida'}</strong></div>
+      ${!ok?`<div style="font-size:11px;margin-top:2px">Correcta: <strong style="color:var(--accent)">${'ABCD'[q.correct]}) ${q.opts[q.correct]}</strong></div>`:''}
+      <div class="q-explanation"><strong>💡 Explicação:</strong> ${q.exp}</div>
+    </div>`;
+  }).join('');
+  showExamStep(3);
+}
+
+// ─── COMPETIÇÕES TABS ─────────────────────────────────────────────────────
+function compTab(el,tab){
+  document.querySelectorAll('.comp-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['duels','group','global'].forEach(t=>document.getElementById('comp-'+t).style.display=t===tab?'block':'none');
+}
+
+// ─── COLLAPSE ─────────────────────────────────────────────────────────────
+function toggleCollapse(bodyId,arrowId){
+  const body=document.getElementById(bodyId);
+  const arrow=document.getElementById(arrowId);
+  const isOpen=arrow.classList.contains('open');
+  if(isOpen){
+    body.style.maxHeight='0';
+    arrow.classList.remove('open');
+  } else {
+    body.style.maxHeight=body.scrollHeight+'px';
+    arrow.classList.add('open');
+  }
+}
+
+// ─── PROFESSORES ──────────────────────────────────────────────────────────
+// Simula papel do utilizador: 'student' ou 'teacher'
+let currentRole = 'student'; // muda para 'teacher' para ver a visão do professor
+
+function teacherTab(tab) {
+  // Atualiza tabs
+  document.querySelectorAll('.teacher-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  // Mostra/oculta views
+  document.getElementById('teacher-explore').style.display = tab === 'explore' ? 'block' : 'none';
+  document.getElementById('teacher-my-lessons').style.display = tab === 'my-lessons' ? 'block' : 'none';
+  document.getElementById('teacher-requests').style.display = tab === 'requests' ? 'block' : 'none';
+  // Balance só na aba explorar
+  document.getElementById('teacher-balance').style.display = tab === 'explore' ? 'flex' : 'none';
+}
+
+// Ao entrar na página de professores, configura as tabs conforme o papel
+document.addEventListener('DOMContentLoaded', () => {
+  if (currentRole === 'teacher') {
+    // Esconde tabs de aluno, mostra tab de professor
+    document.getElementById('tab-explore').style.display = 'none';
+    document.getElementById('tab-my-lessons').style.display = 'none';
+    document.getElementById('tab-requests').style.display = 'flex';
+    teacherTab('requests');
+  }
+});
+
+// Modal de solicitar ajuda
+let modalTeacher = {};
+function openRequestModal(name, subject, price) {
+  modalTeacher = { name, subject, price };
+  document.getElementById('modal-name').textContent = 'Prof. ' + name;
+  document.getElementById('modal-subject').textContent = subject;
+  document.getElementById('modal-price').textContent = price + ' MT';
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2);
+  document.getElementById('modal-av').textContent = initials;
+  document.getElementById('modal-desc').value = '';
+  document.getElementById('request-modal').classList.add('open');
+}
+
+function closeRequestModal(e) {
+  if (e === null || e.target === document.getElementById('request-modal')) {
+    document.getElementById('request-modal').classList.remove('open');
+  }
+}
+
+function submitHelpRequest() {
+  const desc = document.getElementById('modal-desc').value.trim();
+  if (!desc) {
+    alert('Por favor, descreva o que você deseja aprender.');
+    return;
+  }
+  document.getElementById('request-modal').classList.remove('open');
+  // Simula confirmação
+  setTimeout(() => {
+    alert(`✅ Solicitação enviada!\n\nO Prof. ${modalTeacher.name} foi notificado.\nO valor de ${modalTeacher.price} MT foi retido e será liberado após a aula.`);
+    teacherTab('my-lessons');
+  }, 150);
+}
+
+// Ações do professor nas solicitações
+function handleLessonAccept(btn) {
+  const card = btn.closest('.request-card');
+  const statusEl = card.querySelector('.request-status');
+  statusEl.className = 'request-status accepted';
+  statusEl.textContent = 'EM CURSO';
+  const actionsEl = card.querySelector('.request-actions');
+  actionsEl.innerHTML = '<button class="btn-sm primary" onclick="alert(\'A abrir sala...\')" >🎥 Entrar</button><button class="btn-sm ghost" onclick="handleLessonFinish(this)">Finalizar</button>';
+}
+
+function handleLessonReject(btn) {
+  const card = btn.closest('.request-card');
+  const statusEl = card.querySelector('.request-status');
+  statusEl.className = 'request-status rejected';
+  statusEl.textContent = 'RECUSADO';
+  const actionsEl = card.querySelector('.request-actions');
+  actionsEl.innerHTML = '<span style="font-size:11px;color:var(--text3)">Solicitação recusada</span>';
+}
+
+function handleLessonFinish(btn) {
+  const card = btn.closest('.request-card');
+  const statusEl = card.querySelector('.request-status');
+  statusEl.className = 'request-status completed';
+  statusEl.textContent = 'CONCLUÍDA';
+  const actionsEl = card.querySelector('.request-actions');
+  actionsEl.innerHTML = '<span style="font-size:11px;color:var(--primary2)">✓ Pagamento liberado!</span>';
+  alert('🎉 Aula concluída! O pagamento foi liberado para sua conta.');
+}
+
+function toggleTeacherStatus(el) {
+  const isOnline = el.classList.contains('on');
+  const statusText = el.previousElementSibling;
+  if (isOnline) {
+    statusText.innerHTML = '<span class="online-dot"></span>Online';
+    statusText.style.color = 'var(--accent)';
+  } else {
+    statusText.innerHTML = '● Offline';
+    statusText.style.color = 'var(--text3)';
+  }
+}
+
+// ─── SISTEMA DE AVALIAÇÃO ─────────────────────────────────────────────────
+let currentRating = 0;
+let ratingTeacher = {};
+const ratingLabels = ['', 'Muito fraco 😞', 'Fraco 😐', 'Bom 🙂', 'Muito bom 😊', 'Excelente! 🤩'];
+
+function openRatingModal(teacherName, subject) {
+  currentRating = 0;
+  ratingTeacher = { teacherName, subject };
+  // Inicializa avatar
+  const initials = teacherName.split(' ').map(w => w[0]).join('').slice(0, 2);
+  document.getElementById('rating-av').textContent = initials;
+  // Texto do modal
+  document.getElementById('rating-sub').innerHTML =
+    `Avalie o Prof. <strong>${teacherName}</strong><br>em ${subject}`;
+  // Reset estrelas
+  document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('active'));
+  document.getElementById('rating-label').textContent = 'Toque numa estrela';
+  // Reset chips
+  document.querySelectorAll('.rating-chip').forEach(c => c.classList.remove('selected'));
+  // Reset textarea
+  document.getElementById('rating-comment').value = '';
+  // Abre modal
+  document.getElementById('rating-modal').classList.add('open');
+}
+
+function selectStar(val) {
+  currentRating = val;
+  document.querySelectorAll('.star-btn').forEach((s, i) => {
+    s.classList.toggle('active', i < val);
+  });
+  document.getElementById('rating-label').textContent = ratingLabels[val];
+}
+
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
+
+function closeRatingModal(e) {
+  if (e === null || e.target === document.getElementById('rating-modal')) {
+    document.getElementById('rating-modal').classList.remove('open');
+  }
+}
+
+function submitRating() {
+  if (currentRating === 0) {
+    // Anima as estrelas para chamar atenção
+    document.getElementById('stars-row').style.animation = 'none';
+    document.getElementById('stars-row').offsetHeight; // reflow
+    document.getElementById('stars-row').style.animation = 'shake .4s ease';
+    document.getElementById('rating-label').textContent = '⚠️ Selecione pelo menos 1 estrela';
+    document.getElementById('rating-label').style.color = 'var(--danger)';
+    return;
+  }
+
+  // Coleta chips selecionados
+  const selectedChips = [...document.querySelectorAll('.rating-chip.selected')]
+    .map(c => c.textContent).join(', ');
+  const comment = document.getElementById('rating-comment').value.trim();
+
+  document.getElementById('rating-modal').classList.remove('open');
+
+  // Atualiza o card de aula concluída
+  setTimeout(() => {
+    const banner = document.getElementById('rate-banner');
+    if (banner) {
+      banner.style.background = 'rgba(0,201,167,.08)';
+      banner.style.border = '1px solid rgba(0,201,167,.2)';
+      banner.innerHTML = `
+        <span style="font-size:20px">✅</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--accent)">Avaliação enviada!</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:1px">${'⭐'.repeat(currentRating)} · ${ratingLabels[currentRating]}</div>
+        </div>`;
+    }
+    // Esconde botão avaliar, mostra badge avaliado
+    const openBtn = document.getElementById('rate-open-btn');
+    const doneBadge = document.getElementById('rate-done-badge');
+    if (openBtn) openBtn.style.display = 'none';
+    if (doneBadge) doneBadge.style.display = 'inline-flex';
+
+    // Feedback de sucesso
+    alert(`✅ Avaliação enviada!\n\n${'⭐'.repeat(currentRating)} ${ratingLabels[currentRating]}\n${selectedChips ? 'Pontos: ' + selectedChips : ''}${comment ? '\n"' + comment + '"' : ''}\n\nObrigado pelo seu feedback!`);
+  }, 200);
+}
+// Animação shake para aviso de estrela não selecionada
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = '@keyframes shake{0%,100%{transform:none}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}';
+document.head.appendChild(shakeStyle);
+</script>

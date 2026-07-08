@@ -1,0 +1,17 @@
+{
+  "name": "sophia-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "backend:dev": "npm run dev -w apps/backend",
+    "mobile:dev": "npm run start -w apps/mobile",
+    "mobile:web": "npm run web -w apps/mobile",
+    "shared:build": "npm run build -w packages/shared"
+  },
+  "dependencies": {
+    "react-markdown": "^10.1.0"
+  }
+}

@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: "Syne", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Default (Light) Mode Colors */
+  --color-background: #F8F9FC;
+  --color-foreground: #101223;
+
+  --color-card: #FFFFFF;
+  --color-card-foreground: #101223;
+
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #101223;
+
+  --color-primary: #5B6EF5;
+  --color-primary-foreground: #FFFFFF;
+
+  --color-secondary: #EDF0F7;
+  --color-secondary-foreground: #5A6494;
+
+  --color-muted: #F1F3F9;
+  --color-muted-foreground: #5A6494;
+
+  --color-accent: #00C9A7;
+  --color-accent-foreground: #FFFFFF;
+
+  --color-destructive: #F55B7A;
+  --color-destructive-foreground: #FFFFFF;
+
+  --color-border: #E2E8F0;
+  --color-input: #E2E8F0;
+  --color-ring: #5B6EF5;
+
+  /* Dark Mode Overrides */
+  --dark-background: #07080F;
+  --dark-foreground: #E8EAF6;
+  --dark-card: #181B30;
+  --dark-card-foreground: #E8EAF6;
+  --dark-popover: #181B30;
+  --dark-popover-foreground: #E8EAF6;
+  --dark-secondary: #1E2240;
+  --dark-secondary-foreground: #9BA3CC;
+  --dark-muted: #141629;
+  --dark-muted-foreground: #9BA3CC;
+  --dark-border: #252A45;
+  --dark-input: #252A45;
+
+  --color-chart-1: #5B6EF5;
+  --color-chart-2: #00C9A7;
+  --color-chart-3: #F5A623;
+  --color-chart-4: #7B8EFF;
+  --color-chart-5: #F55B7A;
+
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+}
+
+@utility dark-theme {
+  --color-background: var(--dark-background);
+  --color-foreground: var(--dark-foreground);
+  --color-card: var(--dark-card);
+  --color-card-foreground: var(--dark-card-foreground);
+  --color-popover: var(--dark-popover);
+  --color-popover-foreground: var(--dark-popover-foreground);
+  --color-secondary: var(--dark-secondary);
+  --color-secondary-foreground: var(--dark-secondary-foreground);
+  --color-muted: var(--dark-muted);
+  --color-muted-foreground: var(--dark-muted-foreground);
+  --color-border: var(--dark-border);
+  --color-input: var(--dark-input);
+}
+
+@layer base {
+  :root {
+    /* Base colors already defined in @theme */
+  }
+
+  .dark {
+    @apply dark-theme;
+  }
+
+  * {
+    @apply border-border outline-ring/50 transition-colors duration-200;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Syne", sans-serif;
+  }
+}
