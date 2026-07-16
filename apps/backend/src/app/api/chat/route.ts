@@ -2,17 +2,16 @@ import { groq } from "@ai-sdk/groq"
 import { generateText } from "ai"
 import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
+import { requireAuth } from "@/lib/api-auth"
 
 export const maxDuration = 60
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url)
-    const userId = searchParams.get("userId")
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
 
-    if (!userId) {
-      return new NextResponse("UserId is required", { status: 400 })
-    }
+    const userId = session.sub
 
     // Busca o chat mais recente do usuário com suas mensagens
     const chat = await db.chat.findFirst({
@@ -34,7 +33,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { messages, userId, chatId: requestedChatId } = await req.json()
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
+
+    const userId = session.sub
+    const { messages, chatId: requestedChatId } = await req.json()
     console.log("[CHAT_API] Raw messages received:", JSON.stringify(messages, null, 2));
 
     if (!process.env.GROQ_API_KEY) {
@@ -51,50 +54,48 @@ export async function POST(req: Request) {
     // Pegar a última mensagem do usuário para salvar
     const lastUserMessage = formattedMessages[formattedMessages.length - 1];
 
-    // Buscar contexto real do aluno se o ID for fornecido
+    // Buscar contexto real do aluno
     let studentContext = "Aluno: Visitante"
     let performanceContext = ""
     let chatId = requestedChatId
     
-    if (userId) {
-      const user = await db.user.findUnique({
-        where: { id: userId },
-        include: { simulations: { take: 3, orderBy: { createdAt: 'desc' } } }
-      })
-      
-      if (user) {
-        studentContext = `Aluno: ${user.name}, Plano: ${user.role}, Saldo: ${user.balance} MT`
-        if (user.simulations.length > 0) {
-          performanceContext = `Desempenho recente: ${user.simulations.map(s => `${s.title}: ${s.score}/${s.totalQuestions}`).join(', ')}`
-        }
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      include: { simulations: { take: 3, orderBy: { createdAt: 'desc' } } }
+    })
+    
+    if (user) {
+      studentContext = `Aluno: ${user.name}, Plano: ${user.role}, Saldo: ${user.balance} MT`
+      if (user.simulations.length > 0) {
+        performanceContext = `Desempenho recente: ${user.simulations.map(s => `${s.title}: ${s.score}/${s.totalQuestions}`).join(', ')}`
+      }
 
-        // Se não tiver chatId, busca o último ou cria um novo
-        if (!chatId) {
-          const lastChat = await db.chat.findFirst({
-            where: { userId },
-            orderBy: { updatedAt: 'desc' }
+      // Se não tiver chatId, busca o último ou cria um novo
+      if (!chatId) {
+        const lastChat = await db.chat.findFirst({
+          where: { userId },
+          orderBy: { updatedAt: 'desc' }
+        })
+        
+        if (lastChat) {
+          chatId = lastChat.id
+        } else {
+          const newChat = await db.chat.create({
+            data: { userId }
           })
-          
-          if (lastChat) {
-            chatId = lastChat.id
-          } else {
-            const newChat = await db.chat.create({
-              data: { userId }
-            })
-            chatId = newChat.id
+          chatId = newChat.id
+        }
+      }
+
+      // Salva a mensagem do usuário no banco
+      if (lastUserMessage && lastUserMessage.role === 'user') {
+        await db.message.create({
+          data: {
+            chatId,
+            role: 'user',
+            content: lastUserMessage.content
           }
-        }
-
-        // Salva a mensagem do usuário no banco
-        if (lastUserMessage && lastUserMessage.role === 'user') {
-          await db.message.create({
-            data: {
-              chatId,
-              role: 'user',
-              content: lastUserMessage.content
-            }
-          })
-        }
+        })
       }
     }
 
@@ -222,7 +223,7 @@ export async function POST(req: Request) {
     })
 
     // Salva a resposta da assistente no banco
-    if (chatId && userId) {
+    if (chatId) {
       await db.message.create({
         data: {
           chatId,

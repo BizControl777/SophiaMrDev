@@ -4,7 +4,7 @@ import { Card, CardContent } from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
 import { Input } from "../../src/components/ui/input";
 import { Ionicons } from "@expo/vector-icons";
-import { api, CURRENT_USER_ID } from "../../src/lib/api";
+import { api } from "../../src/lib/api";
 
 export default function TeachersScreen() {
   const [teachers, setTeachers] = useState<any[]>([]);
@@ -22,9 +22,9 @@ export default function TeachersScreen() {
     try {
       const [teachersData, userData, studentRequests, teacherRequests] = await Promise.all([
         api.get("/teachers"),
-        api.get(`/user?userId=${CURRENT_USER_ID}`),
-        api.get(`/lessons?userId=${CURRENT_USER_ID}&role=STUDENT`),
-        api.get(`/lessons?userId=${CURRENT_USER_ID}&role=TEACHER`)
+        api.get("/user"),
+        api.get("/lessons?role=STUDENT"),
+        api.get("/lessons?role=TEACHER"),
       ]);
       setTeachers(teachersData);
       setUserBalance(userData.balance);
@@ -73,7 +73,6 @@ export default function TeachersScreen() {
 
     try {
       await api.post("/lessons", {
-        studentId: CURRENT_USER_ID,
         teacherId: selectedTeacher.id,
         subject: selectedTeacher.subject,
         description: requestDescription,

@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useAuth } from "@/components/auth-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -64,7 +65,7 @@ export default function PerfilPage() {
 
   const fetchStudentStats = async () => {
     try {
-      const response = await fetch(`/api/user/stats?userId=${user?.id}`)
+      const response = await authFetch(`/api/user/stats?userId=${user?.id}`)
       if (response.ok) {
         const data = await response.json()
         setStudentStats(data)
@@ -91,7 +92,7 @@ export default function PerfilPage() {
       }
 
       // 1. Duelos
-      const resDuels = await fetch(`/api/user/duels?userId=${user?.id}`)
+      const resDuels = await authFetch(`/api/user/duels?userId=${user?.id}`)
       if (resDuels.ok) {
         const duelsData = await resDuels.json()
         const duelsList = duelsData.duels || []
@@ -115,7 +116,7 @@ export default function PerfilPage() {
       }
 
       // 2. Simulados
-      const resSimulations = await fetch(`/api/simulations?userId=${user?.id}`)
+      const resSimulations = await authFetch(`/api/simulations?userId=${user?.id}`)
       if (resSimulations.ok) {
         const simsList = await resSimulations.json()
         simsList.forEach((s: any) => {
@@ -131,7 +132,7 @@ export default function PerfilPage() {
       }
 
       // 3. Conversas com Tutor IA
-      const resChat = await fetch(`/api/chat?userId=${user?.id}`)
+      const resChat = await authFetch(`/api/chat?userId=${user?.id}`)
       if (resChat.ok) {
         const chatMessages = await resChat.json()
         chatMessages.forEach((msg: any) => {
@@ -152,7 +153,7 @@ export default function PerfilPage() {
       }
 
       // 4. Aulas/Mentorias solicitadas pelo estudante
-      const resLessons = await fetch(`/api/lessons?userId=${user?.id}&role=STUDENT`)
+      const resLessons = await authFetch(`/api/lessons?userId=${user?.id}&role=STUDENT`)
       if (resLessons.ok) {
         const lessonsList = await resLessons.json()
         lessonsList.forEach((l: any) => {
@@ -206,7 +207,7 @@ export default function PerfilPage() {
         return `há ${diffDays} dias`
       }
 
-      const resLessons = await fetch(`/api/lessons?userId=${user?.id}&role=TEACHER`)
+      const resLessons = await authFetch(`/api/lessons?userId=${user?.id}&role=TEACHER`)
       if (resLessons.ok) {
         const lessonsList = await resLessons.json()
         lessonsList.forEach((l: any) => {
@@ -246,7 +247,7 @@ export default function PerfilPage() {
 
   const fetchTeacherData = async () => {
     try {
-      const response = await fetch(`/api/teachers/profile?userId=${user?.id}`)
+      const response = await authFetch(`/api/teachers/profile?userId=${user?.id}`)
       if (response.ok) {
         const data = await response.json()
         setTeacherProfile(data.profile)
@@ -270,7 +271,7 @@ export default function PerfilPage() {
   const handleSaveProfile = async () => {
     setIsSavingProfile(true)
     try {
-      const response = await fetch("/api/teachers/profile", {
+      const response = await authFetch("/api/teachers/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -305,19 +306,21 @@ export default function PerfilPage() {
 
     setIsRecharging(true)
     try {
-      const res = await fetch("/api/user/recharge", {
+      const res = await authFetch("/api/user/recharge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user?.id, amount, phoneNumber }),
       })
       if (res.ok) {
         const data = await res.json()
-        alert(`Sucesso! Transação ${data.transactionId}. Recarga de ${amount} MT realizada via M-Pesa!`)
+        const simNote = data.simulated ? " (simulação local)" : ""
+        alert(`Sucesso! Transação ${data.transactionId}. Recarga de ${amount} MT realizada via M-Pesa${simNote}!`)
         setIsRechargeOpen(false)
         setRechargeAmount("")
         if (refreshUser) await refreshUser()
       } else {
-        alert("Erro ao recarregar. Tente novamente.")
+        const errText = await res.text()
+        alert(errText || "Erro ao recarregar. Tente novamente.")
       }
     } catch (error) {
       console.error(error)

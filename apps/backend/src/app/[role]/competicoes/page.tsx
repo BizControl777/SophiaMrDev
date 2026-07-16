@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -48,7 +49,7 @@ export default function CompeticoesPage() {
       if (!user?.id) return
       try {
         // 1. Busca os estudantes reais do ranking para a seção de "Colegas Online"
-        const resRanking = await fetch('/api/ranking?role=STUDENT&limit=10')
+        const resRanking = await authFetch('/api/ranking?role=STUDENT&limit=10')
         if (resRanking.ok) {
           const data = await resRanking.json()
           const students = data.ranking || []
@@ -66,14 +67,14 @@ export default function CompeticoesPage() {
         }
 
         // 2. Busca o histórico real de duelos
-        const resDuels = await fetch(`/api/user/duels?userId=${user.id}`)
+        const resDuels = await authFetch(`/api/user/duels?userId=${user.id}`)
         if (resDuels.ok) {
           const data = await resDuels.json()
           setRecentActivity(data.duels || [])
         }
 
         // 3. Busca o percentil para a "Liga"
-        const resStats = await fetch(`/api/user/stats?userId=${user.id}`)
+        const resStats = await authFetch(`/api/user/stats?userId=${user.id}`)
         if (resStats.ok) {
           const data = await resStats.json()
           setUserStats(data)

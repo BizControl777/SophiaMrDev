@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { Bot, User, Send, Plus, Lightbulb, Pencil, ClipboardList, GraduationCap, BookOpen, CheckCircle2, MessageSquare, Copy, Check, FileUp, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -49,7 +50,7 @@ export default function TutorPage() {
       const formData = new FormData()
       formData.append("file", file)
 
-      const res = await fetch("/api/pdf-extract", {
+      const res = await authFetch("/api/pdf-extract", {
         method: "POST",
         body: formData
       })
@@ -156,7 +157,7 @@ export default function TutorPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await authFetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

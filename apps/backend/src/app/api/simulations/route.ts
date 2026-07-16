@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireAuth, resolveUserId } from "@/lib/api-auth"
 
 export async function POST(req: Request) {
   try {
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
+
     const body = await req.json()
+    const userId = session.sub
     const { 
-      userId, 
       title, 
       subject, 
       score, 
@@ -14,7 +18,7 @@ export async function POST(req: Request) {
       results 
     } = body
 
-    if (!userId || !title || !subject || score === undefined) {
+    if (!title || !subject || score === undefined) {
       return new NextResponse("Missing fields", { status: 400 })
     }
 
@@ -39,12 +43,11 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url)
-    const userId = searchParams.get("userId")
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
 
-    if (!userId) {
-      return new NextResponse("User ID required", { status: 400 })
-    }
+    const { searchParams } = new URL(req.url)
+    const userId = resolveUserId(session, searchParams.get("userId"))
 
     const simulations = await db.simulation.findMany({
       where: { userId },

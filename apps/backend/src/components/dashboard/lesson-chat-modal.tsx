@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useState, useRef, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -35,7 +36,7 @@ export function LessonChatModal({ lesson, user, isOpen, onClose, onUpdate }: Les
 
     setIsSending(true)
     try {
-      const response = await fetch("/api/lessons", {
+      const response = await authFetch("/api/lessons", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

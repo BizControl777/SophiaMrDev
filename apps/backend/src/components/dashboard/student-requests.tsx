@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -27,7 +28,7 @@ export function StudentRequestsView() {
   const fetchRequests = async () => {
     if (!user?.id) return
     try {
-      const response = await fetch(`/api/lessons?userId=${user.id}&role=${role}`)
+      const response = await authFetch(`/api/lessons?userId=${user.id}&role=${role}`)
       const data = await response.json()
       setRequests(data)
     } catch (error) {
@@ -41,7 +42,7 @@ export function StudentRequestsView() {
     if (!confirm("Deseja realmente finalizar a aula e liberar o pagamento para o professor?")) return
 
     try {
-      const response = await fetch("/api/lessons", {
+      const response = await authFetch("/api/lessons", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -62,7 +63,7 @@ export function StudentRequestsView() {
     if (!confirm("Deseja realmente cancelar esta solicitação? O valor será reembolsado imediatamente.")) return
 
     try {
-      const response = await fetch("/api/lessons", {
+      const response = await authFetch("/api/lessons", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

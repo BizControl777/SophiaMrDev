@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -29,6 +31,19 @@ model User {
   createdDuels     Duel[]          @relation("CreatedDuels")
   participatedDuels Duel[]         @relation("ParticipatedDuels")
   achievements     UserAchievement[]
+  balanceTxs       BalanceTransaction[]
+}
+
+/// Idempotent ledger for balance changes (unique reference prevents double payout).
+model BalanceTransaction {
+  id        String   @id @default(uuid())
+  userId    String
+  amount    Float    // positive = credit, negative = debit
+  type      String   // RECHARGE, DUEL_BET, DUEL_PRIZE, DUEL_REFUND, LESSON_HOLD, LESSON_PAYOUT, LESSON_REFUND
+  reference String   @unique
+  meta      String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Lesson {

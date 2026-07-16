@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { API_URL, setUserId } from "../src/lib/api";
+import { registerRequest } from "../src/lib/api";
 
 const AVAILABLE_SUBJECTS = [
   "Matemática", "Física", "Química", "Biologia", 
@@ -67,20 +67,8 @@ export default function RegisterScreen() {
         payload.experience = experience;
       }
 
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      await registerRequest(payload);
 
-      if (!response.ok) {
-        const errorMsg = await response.text();
-        throw new Error(errorMsg);
-      }
-
-      const user = await response.json();
-      setUserId(user.id);
-      
       const successMessage = role === "STUDENT" 
         ? "Conta criada com sucesso! Ganhaste 1000 MT de bónus de boas-vindas."
         : "Perfil de professor criado! Estás pronto para começar a ensinar.";

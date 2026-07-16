@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireAuth } from "@/lib/api-auth"
 
 export async function GET(req: Request) {
   try {
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
+
     const { searchParams } = new URL(req.url)
     const limit = parseInt(searchParams.get("limit") || "10", 10)
     const role = searchParams.get("role") || "STUDENT"

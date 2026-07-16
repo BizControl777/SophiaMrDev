@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, School, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
+import { User, School, ArrowLeft, Loader2 } from "lucide-react"
+import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { UserRole } from "@/types/auth"
 
 export default function CadastroPage() {
+  const { login } = useAuth()
   const router = useRouter()
   const [selectedRole, setSelectedRole] = useState<UserRole>("STUDENT")
   const [formData, setFormData] = useState({
@@ -20,7 +22,6 @@ export default function CadastroPage() {
     confirmPassword: ""
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
 
   const handleRegister = async () => {
     const { name, email, password, confirmPassword } = formData
@@ -44,15 +45,19 @@ export default function CadastroPage() {
           name, 
           email, 
           password, 
-          role: selectedRole 
+          role: selectedRole,
+          chosenSubjects: ["Matemática", "Português"]
         })
       })
 
       if (response.ok) {
-        setSuccess(true)
-        setTimeout(() => {
-          router.push("/login")
-        }, 2000)
+        const { token, user } = await response.json()
+        if (!token || !user) {
+          alert("Resposta de cadastro inválida.")
+          return
+        }
+        login(user, token)
+        router.push("/" + user.role.toLowerCase() + "/dashboard")
       } else {
         const error = await response.text()
         alert(`Erro no cadastro: ${error}`)
@@ -63,23 +68,6 @@ export default function CadastroPage() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  if (success) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <Card className="w-full max-w-md border-border/50 bg-card/50 backdrop-blur-sm text-center p-8">
-          <div className="flex justify-center mb-6">
-            <div className="h-16 w-16 bg-green-500/20 rounded-full flex items-center justify-center text-green-500">
-              <CheckCircle2 className="h-10 w-10" />
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold mb-2">Conta Criada!</h2>
-          <p className="text-muted-foreground mb-6">Sua conta foi criada com sucesso. Redirecionando para o login...</p>
-          <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
-        </Card>
-      </div>
-    )
   }
 
   return (

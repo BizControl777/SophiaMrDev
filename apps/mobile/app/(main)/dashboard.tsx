@@ -2,14 +2,14 @@ import { View, Text, ScrollView, TouchableOpacity, SafeAreaView } from "react-na
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { api, CURRENT_USER_ID } from "../../src/lib/api";
+import { api } from "../../src/lib/api";
 
 export default function DashboardScreen() {
   const [isCollapsed, setIsCollapsed] = useState({ performance: false, progress: false });
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    api.get(`/user?userId=${CURRENT_USER_ID}`)
+    api.get("/user")
       .then(data => setUser(data))
       .catch(err => console.error("Error loading user in dashboard:", err));
   }, []);

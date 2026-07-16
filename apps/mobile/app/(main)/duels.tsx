@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Card } from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
 import { Input } from "../../src/components/ui/input";
-import { API_URL, CURRENT_USER_ID } from "../../src/lib/api";
+import { api, CURRENT_USER_ID } from "../../src/lib/api";
 import { LinearGradient } from "expo-linear-gradient";
 
 if (Platform.OS === 'android') {
@@ -28,6 +28,10 @@ export default function DuelsScreen() {
   const [currentDuelId, setCurrentDuelId] = useState<string | null>(null);
   const [isCreator, setIsCreator] = useState(true);
   const [finalOpponentScore, setFinalOpponentScore] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const answersRef = useRef<number[]>([]);
+  const currentIdxRef = useRef(0);
+  const advancingRef = useRef(false);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -52,16 +56,16 @@ export default function DuelsScreen() {
     try {
       setLoading(true);
       const [oppRes, pendingRes, histRes, userRes] = await Promise.all([
-        fetch(`${API_URL}/duels/opponents?userId=${CURRENT_USER_ID}&subject=${subj}`).then(res => res.json()),
-        fetch(`${API_URL}/duels/pending?userId=${CURRENT_USER_ID}`).then(res => res.json()),
-        fetch(`${API_URL}/user/duels?userId=${CURRENT_USER_ID}`).then(res => res.json()),
-        fetch(`${API_URL}/user?userId=${CURRENT_USER_ID}`).then(res => res.json())
+        api.get(`/duels/opponents?subject=${encodeURIComponent(subj)}`),
+        api.get("/duels/pending"),
+        api.get("/user/duels"),
+        api.get("/user"),
       ]);
 
       setOpponents(oppRes || []);
       setActiveChallenges(pendingRes || []);
-      setHistory(histRes.duels || []);
-      setUserBalance(userRes.balance || 0);
+      setHistory(histRes?.duels || []);
+      setUserBalance(userRes?.balance || 0);
     } catch (e) {
       console.error("Erro ao carregar dados:", e);
     } finally {
@@ -78,7 +82,7 @@ export default function DuelsScreen() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          handleNextQuestion(false);
+          if (!advancingRef.current) advanceQuestion(-1);
           return 15;
         }
         return prev - 1;
@@ -86,35 +90,40 @@ export default function DuelsScreen() {
     }, 1000);
   };
 
-  const handleNextQuestion = (isCorrect: boolean) => {
-    let newScore = userScore;
-    if (isCorrect) {
-      newScore += 1;
-      setUserScore(newScore);
-    }
-    
+  const advanceQuestion = (choice: number) => {
+    if (advancingRef.current) return;
+    advancingRef.current = true;
+
+    const idx = currentIdxRef.current;
+    const nextAnswers = [...answersRef.current];
+    nextAnswers[idx] = choice;
+    answersRef.current = nextAnswers;
+    setAnswers(nextAnswers);
+
     setTimeout(() => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      if (currentIdx < questions.length - 1) {
-        setCurrentIdx(prev => prev + 1);
+      if (idx < questions.length - 1) {
+        const nextIdx = idx + 1;
+        currentIdxRef.current = nextIdx;
+        setCurrentIdx(nextIdx);
         setSelectedAnswer(null);
         setTimeLeft(15);
+        advancingRef.current = false;
       } else {
         if (timerRef.current) clearInterval(timerRef.current);
-        finishDuel(newScore);
+        finishDuel(nextAnswers);
       }
-    }, 1000);
+    }, 400);
   };
 
-  const finishDuel = async (finalScore: number) => {
+  const finishDuel = async (finalAnswers: number[]) => {
     try {
-      const res = await fetch(`${API_URL}/duels/${currentDuelId}/finish`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: CURRENT_USER_ID, score: finalScore })
+      const data = await api.post(`/duels/${currentDuelId}/finish`, {
+        answers: finalAnswers,
       });
-      const data = await res.json();
-      
+
+      if (typeof data.score === "number") setUserScore(data.score);
+
       if (data.finished) {
         const d = data.duel;
         const oppSc = isCreator ? d.opponentScore : d.creatorScore;
@@ -125,14 +134,14 @@ export default function DuelsScreen() {
     } catch (e) {
       console.error("Erro ao gravar resultado:", e);
     }
-    setGameState('FINISHED');
+    setGameState("FINISHED");
     fetchData();
   };
 
   const handleSelectOption = (idx: number) => {
     if (selectedAnswer !== null) return;
     setSelectedAnswer(idx);
-    handleNextQuestion(idx === questions[currentIdx].correctAnswer);
+    advanceQuestion(idx);
   };
 
   const handleOpenChallengeModal = (player: any) => {
@@ -154,22 +163,12 @@ export default function DuelsScreen() {
 
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/duels/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: CURRENT_USER_ID,
-          opponentId: selectedOpponent.id,
-          subject: challengeSubject,
-          betAmount: bet,
-          scheduledAt: challengeDate ? new Date(challengeDate).toISOString() : null
-        })
+      await api.post("/duels/create", {
+        opponentId: selectedOpponent.id,
+        subject: challengeSubject,
+        betAmount: bet,
+        scheduledAt: challengeDate ? new Date(challengeDate).toISOString() : null,
       });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Erro ao criar desafio");
-      }
 
       setIsModalVisible(false);
       Alert.alert("Sucesso", `Desafio de ${challengeSubject} enviado para ${selectedOpponent.name}!`);
@@ -191,17 +190,7 @@ export default function DuelsScreen() {
 
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/duels/accept`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ duelId })
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Erro ao aceitar");
-      }
-
+      await api.post("/duels/accept", { duelId });
       Alert.alert("Desafio Aceite", "Você aceitou o duelo! Jogue agora clicando em 'Entrar'.");
       fetchData();
     } catch (e: any) {
@@ -214,14 +203,7 @@ export default function DuelsScreen() {
   const handleDeclineChallenge = async (duelId: string) => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/duels/decline`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ duelId })
-      });
-
-      if (!res.ok) throw new Error("Erro ao recusar");
-
+      await api.post("/duels/decline", { duelId });
       Alert.alert("Desafio Recusado", "Você recusou o convite. O valor apostado foi devolvido ao oponente.");
       fetchData();
     } catch (e) {
@@ -234,20 +216,27 @@ export default function DuelsScreen() {
   const handleStartGame = (duel: any) => {
     const isUserCreator = duel.creatorId === CURRENT_USER_ID;
     const opp = isUserCreator ? duel.opponent : duel.creator;
+    const parsed = typeof duel.questions === "string" ? JSON.parse(duel.questions) : duel.questions;
+    const initialAnswers = new Array(parsed.length).fill(-1);
 
     setOpponent({
       name: opp.name,
       avatar: opp.avatar || `https://ui-avatars.com/api/?name=${opp.name}&background=181B30&color=5B6EF5`
     });
-    setQuestions(JSON.parse(duel.questions));
+    setQuestions(parsed);
     setCurrentDuelId(duel.id);
     setIsCreator(isUserCreator);
     setFinalOpponentScore(isUserCreator ? duel.opponentScore : duel.creatorScore);
+    answersRef.current = initialAnswers;
+    setAnswers(initialAnswers);
+    currentIdxRef.current = 0;
+    advancingRef.current = false;
 
     setGameState('PLAYING');
     setCurrentIdx(0);
     setUserScore(0);
     setOpponentScore(0);
+    setSelectedAnswer(null);
     setTimeLeft(15);
     startTimer();
   };
@@ -512,24 +501,18 @@ export default function DuelsScreen() {
               onPress={() => handleSelectOption(i)}
               disabled={selectedAnswer !== null}
               className={`flex-row items-center gap-4 p-5 rounded-2xl border ${
-                selectedAnswer !== null 
-                  ? i === q.correctAnswer 
-                    ? 'bg-sophia-accent/10 border-sophia-accent' 
-                    : i === selectedAnswer 
-                      ? 'bg-sophia-danger/10 border-sophia-danger' 
-                      : 'bg-sophia-bg3 border-sophia-border opacity-50'
+                selectedAnswer === i
+                  ? 'bg-sophia-primary/10 border-sophia-primary'
                   : 'bg-sophia-card border-sophia-border'
               }`}
             >
               <View className={`h-8 w-8 rounded-lg items-center justify-center ${
-                selectedAnswer !== null && i === q.correctAnswer ? 'bg-sophia-accent' : 
-                selectedAnswer !== null && i === selectedAnswer ? 'bg-sophia-danger' : 'bg-sophia-bg3'
+                selectedAnswer === i ? 'bg-sophia-primary' : 'bg-sophia-bg3'
               }`}>
                 <Text className="text-white font-black">{'ABCD'[i]}</Text>
               </View>
               <Text className="flex-1 text-sophia-text font-medium">{opt}</Text>
-              {selectedAnswer !== null && i === q.correctAnswer && <Ionicons name="checkmark-circle" size={20} color="#00C9A7" />}
-              {selectedAnswer !== null && i === selectedAnswer && i !== q.correctAnswer && <Ionicons name="close-circle" size={20} color="#F55B7A" />}
+              {selectedAnswer === i && <Ionicons name="checkmark-circle" size={20} color="#5B6EF5" />}
             </TouchableOpacity>
           ))}
         </View>

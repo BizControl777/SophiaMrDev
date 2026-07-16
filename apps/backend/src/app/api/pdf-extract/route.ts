@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server"
+import { requireAuth } from "@/lib/api-auth"
 
 export const runtime = "nodejs"
 
 export async function POST(req: Request) {
   try {
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
+
     const formData = await req.formData()
     const file = formData.get("file") as Blob | null
 

@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -89,8 +90,8 @@ export default function ExamesPage() {
   const fetchExams = async () => {
     try {
       const [oldRes, aiRes] = await Promise.all([
-        fetch(`/api/exames?isOld=true&search=${searchTerm}`),
-        fetch(`/api/exames?isOld=false&search=${searchTerm}`)
+        authFetch(`/api/exames?isOld=true&search=${searchTerm}`),
+        authFetch(`/api/exames?isOld=false&search=${searchTerm}`)
       ])
       
       if (!oldRes.ok || !aiRes.ok) {
@@ -125,7 +126,7 @@ export default function ExamesPage() {
     setView("taking_exam")
     
     try {
-      const res = await fetch("/api/exames/generate", {
+      const res = await authFetch("/api/exames/generate", {
         method: "POST",
         body: JSON.stringify({ 
           theme: selectedTheme,
@@ -167,7 +168,7 @@ export default function ExamesPage() {
 
   const downloadPDF = async (examToDownload: Exam) => {
     try {
-      const res = await fetch("/api/exames/pdf", {
+      const res = await authFetch("/api/exames/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -203,7 +204,7 @@ export default function ExamesPage() {
     // Salvar resultado no banco
     if (user?.id && exam) {
       try {
-        await fetch("/api/simulations", {
+        await authFetch("/api/simulations", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -349,7 +350,7 @@ export default function ExamesPage() {
     setLoading(true)
     setChallengeSubject(subject)
     try {
-      const res = await fetch("/api/exames/generate", {
+      const res = await authFetch("/api/exames/generate", {
         method: "POST",
         body: JSON.stringify({ theme: subject, count: 3, difficulty: "difícil" }),
         headers: { "Content-Type": "application/json" }

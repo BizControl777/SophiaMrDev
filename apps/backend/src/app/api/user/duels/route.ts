@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireAuth, resolveUserId } from "@/lib/api-auth"
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url)
-    const userId = searchParams.get("userId")
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
 
-    if (!userId) {
-      return new NextResponse("User ID required", { status: 400 })
-    }
+    const { searchParams } = new URL(req.url)
+    const userId = resolveUserId(session, searchParams.get("userId"))
 
     // Busca os duelos finalizados onde o usuário foi criador ou oponente
     const duels = await db.duel.findMany({

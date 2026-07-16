@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireRole } from "@/lib/api-auth"
 
 export async function POST(req: Request) {
   try {
+    const session = await requireRole(req, ["ADMIN"])
+    if (session instanceof NextResponse) return session
+
     const body = await req.json()
     const { 
       examTitle, 

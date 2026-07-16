@@ -35,7 +35,7 @@ export function DuelArena({ opponent, currentUser, type, onClose }: DuelArenaPro
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await fetch("/api/exames/generate", {
+        const res = await authFetch("/api/exames/generate", {
           method: "POST",
           body: JSON.stringify({ theme: "Geral", count: 3, difficulty: "médio" }),
           headers: { "Content-Type": "application/json" }
@@ -99,26 +99,6 @@ export function DuelArena({ opponent, currentUser, type, onClose }: DuelArenaPro
       }
     }, 1000)
   }
-
-  // Finalizar duelo
-  useEffect(() => {
-    if (finished) {
-      const result = userScore > opponentScore ? 'WIN' : userScore < opponentScore ? 'LOSS' : 'DRAW'
-      
-      // Chamada silenciosa para salvar no BD
-      fetch("/api/duels/finish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: currentUser?.id,
-          opponentId: opponent.id,
-          userScore,
-          opponentScore,
-          result
-        })
-      }).catch(console.error)
-    }
-  }, [finished, opponent.id, opponentScore, userScore, currentUser?.id])
 
   if (loading || questions.length === 0) {
     return (

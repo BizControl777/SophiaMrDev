@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireAuth, requireRole, resolveUserId, assertSelfOrAdmin } from "@/lib/api-auth"
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url)
-    const userId = searchParams.get("userId")
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
 
-    if (!userId) {
-      return new NextResponse("User ID required", { status: 400 })
-    }
+    const { searchParams } = new URL(req.url)
+    const userId = resolveUserId(session, searchParams.get("userId"))
 
     const teacherProfile = await db.teacherProfile.findUnique({
       where: { userId }
@@ -35,12 +35,15 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const body = await req.json()
-    const { userId, subject, bio, experience, pricePerLesson, institution, specialties } = body
+    const session = await requireRole(req, ["TEACHER", "ADMIN"])
+    if (session instanceof NextResponse) return session
 
-    if (!userId) {
-      return new NextResponse("User ID required", { status: 400 })
-    }
+    const body = await req.json()
+    const { subject, bio, experience, pricePerLesson, institution, specialties } = body
+    const userId = resolveUserId(session, body.userId)
+
+    const forbidden = assertSelfOrAdmin(session, userId)
+    if (forbidden) return forbidden
 
     // Upsert to ensure if it doesn't exist, we create it.
     const updatedProfile = await db.teacherProfile.upsert({

@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -28,7 +29,7 @@ export function AdminUserManagement() {
   const fetchUsers = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/admin/users?search=${search}`)
+      const response = await authFetch(`/api/admin/users?search=${search}`)
       if (response.ok) {
         const data = await response.json()
         setUsers(data)
@@ -50,7 +51,7 @@ export function AdminUserManagement() {
   const toggleStatus = async (userId: string, currentStatus: string) => {
     try {
       const newStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE'
-      const response = await fetch("/api/admin/users", {
+      const response = await authFetch("/api/admin/users", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, status: newStatus })

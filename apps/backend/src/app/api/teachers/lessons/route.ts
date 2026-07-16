@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireAuth, resolveUserId } from "@/lib/api-auth"
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url)
-    const teacherId = searchParams.get("teacherId")
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
 
-    if (!teacherId) {
-      return new NextResponse("Teacher ID required", { status: 400 })
-    }
+    const { searchParams } = new URL(req.url)
+    const teacherId = resolveUserId(session, searchParams.get("teacherId"))
 
     const lessons = await db.lesson.findMany({
       where: { teacherId },

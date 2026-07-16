@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, Switch, Activit
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { api, CURRENT_USER_ID } from "../../src/lib/api";
+import { api } from "../../src/lib/api";
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
@@ -11,7 +11,7 @@ export default function ProfileScreen() {
 
   const fetchUserProfile = async () => {
     try {
-      const data = await api.get(`/user?userId=${CURRENT_USER_ID}`);
+      const data = await api.get("/user");
       setUser(data);
     } catch (error) {
       console.error("Error fetching user profile:", error);

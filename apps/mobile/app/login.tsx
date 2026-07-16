@@ -1,17 +1,31 @@
-import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { loginRequest } from "../src/lib/api";
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Simulação de login para teste de UI
-    router.replace("/(main)/dashboard");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Erro", "Preenche email e senha.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await loginRequest(email.trim(), password);
+      router.replace("/(main)/dashboard");
+    } catch (error: any) {
+      Alert.alert("Falha no login", error?.message || "Credenciais inválidas");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,6 +64,7 @@ export default function LoginScreen() {
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
+                  keyboardType="email-address"
                 />
               </View>
             </View>
@@ -75,9 +90,14 @@ export default function LoginScreen() {
 
             <TouchableOpacity 
               onPress={handleLogin}
+              disabled={isLoading}
               className="bg-sophia-primary h-14 rounded-2xl items-center justify-center shadow-lg shadow-sophia-primary/30 mt-4"
             >
-              <Text className="text-white font-bold text-base">Entrar</Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-white font-bold text-base">Entrar</Text>
+              )}
             </TouchableOpacity>
 
             <View className="flex-row items-center justify-center mt-6">

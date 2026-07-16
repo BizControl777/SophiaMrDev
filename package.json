@@ -12,6 +12,11 @@
     "shared:build": "npm run build -w packages/shared"
   },
   "dependencies": {
+    "ai": "^7.0.29",
+    "lightningcss-wasm": "^1.32.0",
     "react-markdown": "^10.1.0"
+  },
+  "devDependencies": {
+    "lightningcss-win32-x64-msvc": "^1.32.0"
   }
 }

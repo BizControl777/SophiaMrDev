@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -49,7 +50,7 @@ export default function ProfessorsPage() {
 
   const fetchTeachers = async () => {
     try {
-      const response = await fetch(`/api/teachers?search=${searchTerm}`)
+      const response = await authFetch(`/api/teachers?search=${searchTerm}`)
       const data = await response.json()
       setTeachers(data)
     } catch (error) {
@@ -62,7 +63,7 @@ export default function ProfessorsPage() {
   const fetchRequests = async () => {
     if (!user?.id) return
     try {
-      const response = await fetch(`/api/lessons?userId=${user.id}&role=${role}`)
+      const response = await authFetch(`/api/lessons?userId=${user.id}&role=${role}`)
       const data = await response.json()
       setRequests(data)
     } catch (error) {
@@ -111,7 +112,7 @@ export default function ProfessorsPage() {
     }
 
     try {
-      const response = await fetch("/api/lessons", {
+      const response = await authFetch("/api/lessons", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -142,7 +143,7 @@ export default function ProfessorsPage() {
     if (!confirm("Deseja realmente cancelar esta solicitação? O valor será reembolsado imediatamente.")) return
 
     try {
-      const response = await fetch("/api/lessons", {
+      const response = await authFetch("/api/lessons", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -162,7 +163,7 @@ export default function ProfessorsPage() {
 
   const handleCompleteRequest = async (lessonId: string) => {
     try {
-      const response = await fetch("/api/lessons", {
+      const response = await authFetch("/api/lessons", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

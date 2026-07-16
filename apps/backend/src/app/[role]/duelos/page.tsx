@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { DuelArena } from "@/components/dashboard/duel-arena"
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
@@ -16,7 +17,7 @@ export default function DuelosPage() {
     const fetchOpponent = async () => {
       try {
         // Agora busca estudantes reais do ranking para duelar
-        const res = await fetch('/api/ranking?role=STUDENT&limit=20')
+        const res = await authFetch('/api/ranking?role=STUDENT&limit=20')
         if (res.ok) {
           const data = await res.json()
           const students = data.ranking || []

@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/components/auth-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -36,14 +37,14 @@ export default function RankingsPage() {
     async function fetchData() {
       try {
         // 1. Busca os melhores estudantes da plataforma limitados a 50
-        const resRanking = await fetch('/api/ranking?role=STUDENT&limit=50')
+        const resRanking = await authFetch('/api/ranking?role=STUDENT&limit=50')
         if (!resRanking.ok) throw new Error('Falha ao carregar ranking')
         const dataRanking = await resRanking.json()
         setRanking(dataRanking.ranking)
 
         // 2. Busca as estatísticas pessoais do usuário logado (se for estudante)
         if (user?.id) {
-          const resStats = await fetch(`/api/user/stats?userId=${user.id}`)
+          const resStats = await authFetch(`/api/user/stats?userId=${user.id}`)
           if (resStats.ok) {
             const dataStats = await resStats.json()
             setUserStats(dataStats)

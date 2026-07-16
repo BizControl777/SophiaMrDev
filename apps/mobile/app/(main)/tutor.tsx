@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Keyb
 import { useState, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { CURRENT_USER_ID, API_URL } from "../../src/lib/api";
+import { api } from "../../src/lib/api";
 import { MarkdownMessage } from "../../src/components/ui/MarkdownMessage";
 
 export default function TutorScreen() {
@@ -24,42 +24,47 @@ export default function TutorScreen() {
   const fetchHistory = async () => {
     try {
       setIsLoading(true);
-      const [userResponse, historyResponse] = await Promise.all([
-        fetch(`${API_URL}/user?userId=${CURRENT_USER_ID}`),
-        fetch(`${API_URL}/chat?userId=${CURRENT_USER_ID}`)
+      const [userData, history] = await Promise.all([
+        api.get("/user"),
+        api.get("/chat"),
       ]);
 
       let currentUserName = "Aluno";
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        if (userData.name) {
-          currentUserName = userData.name;
-          setUserName(userData.name);
-          const nameParts = userData.name.split(' ');
-          const initials = nameParts.length > 1 
+      if (userData?.name) {
+        currentUserName = userData.name;
+        setUserName(userData.name);
+        const nameParts = userData.name.split(" ");
+        const initials =
+          nameParts.length > 1
             ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase()
             : userData.name.substring(0, 2).toUpperCase();
-          setUserInitials(initials);
-        }
+        setUserInitials(initials);
       }
 
-      if (historyResponse.ok) {
-        const history = await historyResponse.json();
-        if (history && history.length > 0) {
-          const formattedHistory = history.map((m: any) => ({
-            id: m.id,
-            role: m.role === 'assistant' ? 'ai' : 'user',
-            text: m.content,
-            time: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          }));
-          setMessages(formattedHistory);
-          setChatId(history[0].chatId);
-        } else {
-          // Mensagem inicial se não houver histórico
-          setMessages([
-            { id: 'welcome', role: 'ai', text: `Olá, **${currentUserName}**! Sou a **SophIA**, a sua tutora IA. Estou aqui para ajudá-lo com qualquer dúvida sobre as suas disciplinas.\n\nO que gostaria de estudar hoje?`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
-          ]);
-        }
+      if (history && history.length > 0) {
+        const formattedHistory = history.map((m: any) => ({
+          id: m.id,
+          role: m.role === "assistant" ? "ai" : "user",
+          text: m.content,
+          time: new Date(m.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        }));
+        setMessages(formattedHistory);
+        setChatId(history[0].chatId);
+      } else {
+        setMessages([
+          {
+            id: "welcome",
+            role: "ai",
+            text: `Olá, **${currentUserName}**! Sou a **SophIA**, a sua tutora IA. Estou aqui para ajudá-lo com qualquer dúvida sobre as suas disciplinas.\n\nO que gostaria de estudar hoje?`,
+            time: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        ]);
       }
     } catch (error) {
       console.error("Erro ao buscar histórico/usuário:", error);
@@ -72,53 +77,59 @@ export default function TutorScreen() {
     if (!inputText.trim() || isLoading) return;
 
     const userMsgText = inputText;
-    const userMsg = { 
-      id: Date.now().toString(), 
-      role: 'user', 
-      text: userMsgText, 
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+    const userMsg = {
+      id: Date.now().toString(),
+      role: "user",
+      text: userMsgText,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setInputText("");
     setIsLoading(true);
 
     try {
-      const apiMessages = [...messages, userMsg].map(m => ({
-        role: m.role === 'ai' ? 'assistant' : 'user',
-        content: m.text
+      const apiMessages = [...messages, userMsg].map((m) => ({
+        role: m.role === "ai" ? "assistant" : "user",
+        content: m.text,
       }));
 
-      const response = await fetch(`${API_URL}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: apiMessages,
-          userId: CURRENT_USER_ID,
-          chatId: chatId
-        })
+      const data = await api.post("/chat", {
+        messages: apiMessages,
+        chatId: chatId,
       });
 
-      if (!response.ok) throw new Error('Falha na comunicação com a SophIA');
-
-      const data = await response.json();
-      
       if (data.chatId) setChatId(data.chatId);
 
-      setMessages(prev => [...prev, { 
-        id: (Date.now() + 1).toString(), 
-        role: 'ai', 
-        text: data.content || "SophIA concluiu o raciocínio.", 
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "ai",
+          text: data.content || "SophIA concluiu o raciocínio.",
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
     } catch (error) {
       console.error("Erro no chat:", error);
-      setMessages(prev => [...prev, { 
-        id: (Date.now() + 1).toString(), 
-        role: 'ai', 
-        text: "Ocorreu um erro ao conectar com o servidor. Verifique se o backend está rodando.", 
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "ai",
+          text: "Ocorreu um erro ao conectar com o servidor. Verifique se o backend está rodando.",
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -25,13 +26,11 @@ export function LessonReviewModal({ lesson, isOpen, onClose, onUpdate }: LessonR
     setIsSubmitting(true)
     
     try {
-      const response = await fetch("/api/lessons/reviews", {
+      const response = await authFetch("/api/lessons/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lessonRequestId: lesson.id,
-          studentId: lesson.studentId,
-          teacherId: lesson.teacherId,
           rating,
           comment
         })

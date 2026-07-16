@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireRole } from "@/lib/api-auth"
 
 export async function GET(req: Request) {
   try {
+    const session = await requireRole(req, ["ADMIN"])
+    if (session instanceof NextResponse) return session
+
     const now = new Date()
     const expiryLimit = new Date(now.getTime() - 24 * 60 * 60 * 1000) // 24 horas atrás
 

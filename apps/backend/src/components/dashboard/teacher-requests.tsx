@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -51,7 +52,7 @@ export function TeacherRequestsView() {
   const fetchRequests = async () => {
     if (!user?.id) return
     try {
-      const response = await fetch(`/api/lessons?userId=${user.id}&role=${role}`)
+      const response = await authFetch(`/api/lessons?userId=${user.id}&role=${role}`)
       const data = await response.json()
       setRequests(data)
     } catch (error) {
@@ -64,7 +65,7 @@ export function TeacherRequestsView() {
   const fetchPublishedLessons = async () => {
     if (!user?.id) return
     try {
-      const response = await fetch(`/api/teachers/lessons?teacherId=${user.id}`)
+      const response = await authFetch(`/api/teachers/lessons?teacherId=${user.id}`)
       if (response.ok) {
         const data = await response.json()
         setPublishedLessons(data)
@@ -105,7 +106,7 @@ export function TeacherRequestsView() {
     setActiveUploadType(null)
   }
 
-  const handleAction = async (id: string, action: 'ACCEPTED' | 'REJECTED' | 'COMPLETED') => {
+  const handleAction = async (id: string, action: 'ACCEPTED' | 'REJECTED') => {
     if (action === 'ACCEPTED') {
       const req = requests.find(r => r.id === id)
       setAcceptingLesson(req)
@@ -113,13 +114,10 @@ export function TeacherRequestsView() {
       return
     }
 
-    const confirmMsg = action === 'REJECTED' ? "Deseja realmente rejeitar esta solicitação?" : 
-                       action === 'COMPLETED' ? "Deseja marcar esta aula como concluída?" : null
-    
-    if (confirmMsg && !confirm(confirmMsg)) return
+    if (!confirm("Deseja realmente rejeitar esta solicitação?")) return
 
     try {
-      const response = await fetch("/api/lessons", {
+      const response = await authFetch("/api/lessons", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -142,7 +140,7 @@ export function TeacherRequestsView() {
     setAcceptLoading(true)
 
     try {
-      const response = await fetch("/api/lessons", {
+      const response = await authFetch("/api/lessons", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

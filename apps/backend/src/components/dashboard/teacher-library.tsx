@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -22,7 +23,7 @@ export function TeacherLibrary() {
 
   const fetchLessons = async () => {
     try {
-      const response = await fetch(`/api/teachers/lessons?teacherId=${user?.id}`)
+      const response = await authFetch(`/api/teachers/lessons?teacherId=${user?.id}`)
       if (response.ok) {
         const data = await response.json()
         setLessons(data)
@@ -38,7 +39,7 @@ export function TeacherLibrary() {
     if (!confirm("Tem certeza que deseja excluir esta aula? Esta ação não pode ser desfeita.")) return
 
     try {
-      const response = await fetch(`/api/lessons/content?id=${id}`, {
+      const response = await authFetch(`/api/lessons/content?id=${id}`, {
         method: "DELETE"
       })
 

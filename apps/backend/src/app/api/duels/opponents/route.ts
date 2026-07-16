@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireAuth, resolveUserId } from "@/lib/api-auth"
 
 export async function GET(req: Request) {
   try {
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
+
     const { searchParams } = new URL(req.url)
-    const userId = searchParams.get("userId")
+    const userId = resolveUserId(session, searchParams.get("userId"))
     const subject = searchParams.get("subject")
 
-    if (!userId || !subject) {
-      return new NextResponse("Missing fields (userId and subject are required)", { status: 400 })
+    if (!subject) {
+      return new NextResponse("Missing fields (subject is required)", { status: 400 })
     }
 
     // Buscar estudantes cadastrados no sistema (excluindo o usuário ativo)

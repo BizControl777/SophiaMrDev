@@ -1,8 +1,12 @@
 import PDFDocument from "pdfkit"
 import { NextResponse } from "next/server"
+import { requireAuth } from "@/lib/api-auth"
 
 export async function POST(req: Request) {
   try {
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
+
     const body = await req.json()
     const { title, questions } = body
 

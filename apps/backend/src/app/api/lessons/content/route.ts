@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireAuth, assertSelfOrAdmin } from "@/lib/api-auth"
+import { stripPassword } from "@/lib/auth"
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
-    const { teacherId, title, subject, description, objectives, materials } = body
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
 
-    if (!teacherId || !title || !subject) {
+    const body = await req.json()
+    const teacherId = session.sub
+    const { title, subject, description, objectives, materials } = body
+
+    if (!title || !subject) {
       return new NextResponse("Missing fields", { status: 400 })
     }
 
@@ -30,6 +36,9 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
+
     const { searchParams } = new URL(req.url)
     const teacherId = searchParams.get("teacherId")
     const subject = searchParams.get("subject")
@@ -40,11 +49,21 @@ export async function GET(req: Request) {
         ...(subject && { subject: { contains: subject } }),
       },
       include: {
-        teacher: true
+        teacher: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            reputation: true,
+            role: true,
+            teacherProfile: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: "desc"
-      }
+        createdAt: "desc",
+      },
     })
 
     return NextResponse.json(lessons)
@@ -56,12 +75,23 @@ export async function GET(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const session = await requireAuth(req)
+    if (session instanceof NextResponse) return session
+
     const { searchParams } = new URL(req.url)
     const lessonId = searchParams.get("id")
 
     if (!lessonId) {
       return new NextResponse("Lesson ID required", { status: 400 })
     }
+
+    const lesson = await db.lesson.findUnique({ where: { id: lessonId } })
+    if (!lesson) {
+      return new NextResponse("Lesson not found", { status: 404 })
+    }
+
+    const forbidden = assertSelfOrAdmin(session, lesson.teacherId)
+    if (forbidden) return forbidden
 
     await db.lesson.delete({
       where: { id: lessonId }

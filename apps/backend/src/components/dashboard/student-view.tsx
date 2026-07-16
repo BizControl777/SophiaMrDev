@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth-fetch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TrendingUp, TrendingDown, BookOpen, Trophy, Swords, Activity, FileText, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -32,7 +33,7 @@ export function StudentDashboard({ name }: { name: string }) {
       if (!user?.id) return
       try {
         // 1. Carrega Estatísticas Gerais
-        const resStats = await fetch(`/api/user/stats?userId=${user.id}`)
+        const resStats = await authFetch(`/api/user/stats?userId=${user.id}`)
         let statsJson: any = null
         if (resStats.ok) {
           statsJson = await resStats.json()
@@ -42,7 +43,7 @@ export function StudentDashboard({ name }: { name: string }) {
         const tempActivities: ActivityItem[] = []
 
         // 2. Carrega Duelos Recentes
-        const resDuels = await fetch(`/api/user/duels?userId=${user.id}`)
+        const resDuels = await authFetch(`/api/user/duels?userId=${user.id}`)
         if (resDuels.ok) {
           const duelsData = await resDuels.json()
           const duelsList = duelsData.duels || []
@@ -71,7 +72,7 @@ export function StudentDashboard({ name }: { name: string }) {
         }
 
         // 3. Carrega Simulados Recentes
-        const resSimulations = await fetch(`/api/simulations?userId=${user.id}`)
+        const resSimulations = await authFetch(`/api/simulations?userId=${user.id}`)
         if (resSimulations.ok) {
           const simsList = await resSimulations.json()
 
@@ -107,7 +108,7 @@ export function StudentDashboard({ name }: { name: string }) {
         }
 
         // 4. Carrega Conversas Recentes com o Tutor IA
-        const resChat = await fetch(`/api/chat?userId=${user.id}`)
+        const resChat = await authFetch(`/api/chat?userId=${user.id}`)
         if (resChat.ok) {
           const chatMessages = await resChat.json()
           chatMessages.forEach((msg: any) => {

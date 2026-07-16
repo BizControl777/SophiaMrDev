@@ -9,7 +9,6 @@ import { GraduationCap, Loader2 } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { UserRole } from "@/types/auth"
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -33,9 +32,12 @@ export default function LoginPage() {
       })
 
       if (response.ok) {
-        const user = await response.json()
-        // O login do context agora vai lidar com o objeto real
-        login?.(user) 
+        const { token, user } = await response.json()
+        if (!token || !user) {
+          alert("Resposta de login inválida.")
+          return
+        }
+        login(user, token)
         router.push("/" + user.role.toLowerCase() + "/dashboard")
       } else {
         alert("Falha no login. Verifique suas credenciais.")

@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, TextInput, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { API_URL, CURRENT_USER_ID } from "../../src/lib/api";
+import { api } from "../../src/lib/api";
 
 export default function ExamsScreen() {
   const [step, setStep] = useState(1);
@@ -24,20 +24,14 @@ export default function ExamsScreen() {
     if (!theme || !topic) return;
     setIsGenerating(true);
     try {
-      const response = await fetch(`${API_URL}/exames/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme: `${theme} - ${topic} (Nível: ${difficulty})`, count: examSize })
+      const data = await api.post("/exames/generate", {
+        theme: `${theme} - ${topic} (Nível: ${difficulty})`,
+        count: examSize,
       });
-      if (response.ok) {
-        const data = await response.json();
-        setGeneratedExam(data);
-        setAnswers(new Array(data.questions.length).fill(-1));
-        setCurrentQuestionIdx(0);
-        setStep(2);
-      } else {
-        console.error("Failed to generate exam");
-      }
+      setGeneratedExam(data);
+      setAnswers(new Array(data.questions.length).fill(-1));
+      setCurrentQuestionIdx(0);
+      setStep(2);
     } catch (error) {
       console.error("Erro ao gerar exame:", error);
     } finally {

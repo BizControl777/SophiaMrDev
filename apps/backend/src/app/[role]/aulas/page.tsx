@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -36,8 +37,8 @@ export default function StudentLessonsPage() {
     const fetchData = async () => {
       try {
         const [lessonsRes, mentorsRes] = await Promise.all([
-          fetch('/api/lessons/manual'),
-          fetch('/api/teachers')
+          authFetch('/api/lessons/manual'),
+          authFetch('/api/teachers')
         ])
         
         if (lessonsRes.ok) {

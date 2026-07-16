@@ -1,5 +1,6 @@
 "use client"
 
+import { authFetch } from "@/lib/auth-fetch"
 import { useState, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -144,7 +145,7 @@ export function ManualLessonCreator() {
     // Nota: Em uma aplicação real, aqui usaríamos FormData para enviar os arquivos
     // Para este protótipo, vamos simular o envio.
     try {
-      const response = await fetch("/api/lessons/content", {
+      const response = await authFetch("/api/lessons/content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
