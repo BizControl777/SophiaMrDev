@@ -6,17 +6,18 @@
     "packages/*"
   ],
   "scripts": {
-    "backend:dev": "npm run dev -w apps/backend",
-    "mobile:dev": "npm run start -w apps/mobile",
-    "mobile:web": "npm run web -w apps/mobile",
-    "shared:build": "npm run build -w packages/shared"
+    "backend:dev": "pnpm --filter apps/backend dev",
+    "mobile:dev": "pnpm --filter apps/mobile start",
+    "mobile:web": "pnpm --filter apps/mobile web",
+    "shared:build": "pnpm --filter packages/shared build",
+    "build": "pnpm run shared:build && pnpm --filter apps/backend build",
+    "vercel-build": "pnpm install --no-frozen-lockfile && pnpm run build"
   },
   "dependencies": {
     "ai": "^7.0.29",
-    "lightningcss-wasm": "^1.32.0",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "lightningcss-wasm": "^1.32.0"
   },
-  "devDependencies": {
-    "lightningcss-win32-x64-msvc": "^1.32.0"
-  }
+  "devDependencies": {},
+  "packageManager": "pnpm@8.15.0"
 }
