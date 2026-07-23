@@ -32,7 +32,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: "desc" }
     })
 
-    const formattedExams = exams.map(exam => ({
+    const formattedExams = exams.map((exam: (typeof exams)[number]) => ({
       ...exam,
       questions: exam.questions.map(q => {
         try {
