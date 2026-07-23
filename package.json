@@ -6,19 +6,18 @@
     "packages/*"
   ],
   "scripts": {
-    "backend:dev": "pnpm --filter @sophia/backend dev",
-    "mobile:dev": "pnpm --filter apps/mobile start",
-    "mobile:web": "pnpm --filter apps/mobile web",
-    "shared:build": "pnpm --filter @sophia/shared build",
-    "build": "pnpm run shared:build && pnpm --filter @sophia/backend build",
-    "start": "pnpm --filter @sophia/backend start",
-    "vercel-build": "pnpm install --no-frozen-lockfile && pnpm run build"
+    "backend:dev": "npm run dev --workspace=apps/backend",
+    "mobile:dev": "npm run start --workspace=apps/mobile",
+    "mobile:web": "npm run web --workspace=apps/mobile",
+    "shared:build": "npm run build --workspace=packages/shared",
+    "build": "npm run shared:build && npm run build --workspace=apps/backend",
+    "start": "npm run start --workspace=apps/backend",
+    "vercel-build": "npm install --legacy-peer-deps && npm run build"
   },
   "dependencies": {
     "ai": "^7.0.29",
     "react-markdown": "^10.1.0",
     "lightningcss-wasm": "^1.32.0"
   },
-  "devDependencies": {},
-  "packageManager": "pnpm@8.15.0"
+  "devDependencies": {}
 }
