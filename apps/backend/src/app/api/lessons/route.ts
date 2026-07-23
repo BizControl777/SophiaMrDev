@@ -164,13 +164,14 @@ export async function GET(req: Request) {
         },
         orderBy: { createdAt: "desc" },
       })
-      lessons = lessons.map((lesson) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      lessons = lessons.map((lesson: any) => ({
         ...lesson,
         teacherName: lesson.teacher.name,
       }))
     }
 
-    return NextResponse.json(lessons.map((l) => sanitizeLesson(l as Record<string, unknown>)))
+    return NextResponse.json(lessons.map((l: any) => sanitizeLesson(l as Record<string, unknown>)))
   } catch (error) {
     console.error("[LESSONS_GET]", error)
     return new NextResponse("Internal Error", { status: 500 })

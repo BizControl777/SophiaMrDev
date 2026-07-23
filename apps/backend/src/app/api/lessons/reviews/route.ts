@@ -56,7 +56,7 @@ export async function POST(req: Request) {
       where: { teacherId },
     })
 
-    const totalRating = teacherReviews.reduce((acc, curr) => acc + curr.rating, 0)
+    const totalRating = teacherReviews.reduce((acc: number, curr: { rating: number }) => acc + curr.rating, 0)
     const averageRating = totalRating / teacherReviews.length
 
     await db.teacherProfile.update({

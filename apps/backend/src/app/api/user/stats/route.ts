@@ -22,7 +22,7 @@ export async function GET(req: Request) {
     })
 
     const totalStudents = allStudents.length
-    const userRankIndex = allStudents.findIndex(s => s.id === userId)
+    const userRankIndex = allStudents.findIndex((s: { id: string }) => s.id === userId)
     
     let percentile = 100
     let rankPosition = 0
@@ -48,7 +48,7 @@ export async function GET(req: Request) {
     if (simulations.length > 0) {
       // Agrupar simulados por disciplina e somar pontuações
       const subjectScores: Record<string, number> = {}
-      simulations.forEach(sim => {
+      simulations.forEach((sim: any) => {
         if (!subjectScores[sim.subject]) subjectScores[sim.subject] = 0
         subjectScores[sim.subject] += sim.score
       })
@@ -88,8 +88,8 @@ export async function GET(req: Request) {
     })
 
     // Calcular média geral baseada nas pontuações de todos os simulados
-    const totalQuestionsSum = simulations.reduce((sum, sim) => sum + sim.totalQuestions, 0)
-    const scoreSum = simulations.reduce((sum, sim) => sum + sim.score, 0)
+    const totalQuestionsSum = simulations.reduce((sum: number, sim: any) => sum + sim.totalQuestions, 0)
+    const scoreSum = simulations.reduce((sum: number, sim: any) => sum + sim.score, 0)
     const averageScore = totalQuestionsSum > 0 ? Math.round((scoreSum / totalQuestionsSum) * 100) : 0
 
     return NextResponse.json({

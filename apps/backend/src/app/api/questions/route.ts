@@ -65,7 +65,8 @@ export async function GET(req: Request) {
       take: 20
     })
 
-    const formattedQuestions = questions.map(q => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedQuestions = questions.map((q: any) => ({
       ...q,
       options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
     }))

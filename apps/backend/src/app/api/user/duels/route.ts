@@ -34,7 +34,8 @@ export async function GET(req: Request) {
     })
 
     // Formatar a resposta
-    const formattedDuels = duels.map(duel => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedDuels = duels.map((duel: any) => {
       const isCreator = duel.creatorId === userId
       const userScore = isCreator ? duel.creatorScore : duel.opponentScore
       const oppScore = isCreator ? duel.opponentScore : duel.creatorScore

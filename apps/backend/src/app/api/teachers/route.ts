@@ -24,7 +24,8 @@ export async function GET(req: Request) {
     })
 
     // Mapear para o formato que o frontend espera
-    const formattedTeachers = teachers.map((teacher) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedTeachers = teachers.map((teacher: any) => ({
       id: teacher.id,
       name: teacher.name,
       subject: teacher.teacherProfile?.subject || "N/A",
@@ -34,7 +35,7 @@ export async function GET(req: Request) {
       price: teacher.teacherProfile?.pricePerLesson || 0,
       image: teacher.avatar || "",
       bio: teacher.teacherProfile?.bio || "",
-      specialties: teacher.teacherProfile?.specialties?.split(",").map(s => s.trim()).filter(Boolean) || [],
+      specialties: teacher.teacherProfile?.specialties?.split(",").map((s: string) => s.trim()).filter(Boolean) || [],
       institution: teacher.teacherProfile?.institution || "UEM",
       achievements: [], 
     }))

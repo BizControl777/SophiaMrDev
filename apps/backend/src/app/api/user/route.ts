@@ -32,9 +32,10 @@ export async function GET(req: Request) {
 
     // Buscar todas as conquistas do sistema
     const allAchievements = await db.achievement.findMany()
-    const unlockedIds = new Set(user.achievements.map(ua => ua.achievementId))
+    const unlockedIds = new Set(user.achievements.map((ua: any) => ua.achievementId))
 
-    const formattedAchievements = allAchievements.map(ach => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedAchievements = allAchievements.map((ach: any) => ({
       name: ach.name,
       description: ach.description,
       icon: ach.icon,

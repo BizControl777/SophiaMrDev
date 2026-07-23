@@ -16,7 +16,8 @@ export async function GET(req: Request) {
     })
 
     // Parse JSON strings before returning
-    const formattedLessons = lessons.map(lesson => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedLessons = lessons.map((lesson: any) => ({
       ...lesson,
       objectives: JSON.parse(lesson.objectives || "[]"),
       materials: JSON.parse(lesson.materials || "[]")
