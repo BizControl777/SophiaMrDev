@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Prisma } from "@prisma/client"
 import { db } from "@/lib/db"
 import { requireAuth, resolveUserId } from "@/lib/api-auth"
 import { debitOnce, applyBalanceOnce, InsufficientBalanceError } from "@/lib/balance"
@@ -80,7 +81,7 @@ export async function POST(req: Request) {
     }
 
     try {
-      const lessonRequest = await db.$transaction(async (tx) => {
+      const lessonRequest = await db.$transaction(async (tx: Prisma.TransactionClient) => {
         const lesson = await tx.lessonRequest.create({
           data: {
             studentId,
@@ -231,7 +232,7 @@ export async function PATCH(req: Request) {
       updatedChatMessages = JSON.stringify(currentMessages)
     }
 
-    const updatedLesson = await db.$transaction(async (tx) => {
+    const updatedLesson = await db.$transaction(async (tx: Prisma.TransactionClient) => {
       const fresh = await tx.lessonRequest.findUnique({ where: { id: lessonId } })
       if (!fresh) throw new Error("MISSING")
 

@@ -161,7 +161,7 @@ export async function submitDuelAnswers(
     )
   }
 
-  const result = await db.$transaction(async (tx) => {
+  const result = await db.$transaction(async (tx: Prisma.TransactionClient) => {
     const fresh = await tx.duel.findUnique({ where: { id: duelId } })
     if (!fresh) throw new Error("MISSING_DUEL")
     if (fresh.status === "FINISHED") {

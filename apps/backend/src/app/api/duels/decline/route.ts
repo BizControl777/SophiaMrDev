@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Prisma } from "@prisma/client"
 import { db } from "@/lib/db"
 import { requireAuth, assertSelfOrAdmin } from "@/lib/api-auth"
 import { applyBalanceOnce } from "@/lib/balance"
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
       return new NextResponse("Duelo já tratado", { status: 400 })
     }
 
-    const updatedDuel = await db.$transaction(async (tx) => {
+    const updatedDuel = await db.$transaction(async (tx: Prisma.TransactionClient) => {
       const fresh = await tx.duel.findUnique({ where: { id: duelId } })
       if (!fresh || fresh.status !== "PENDING") {
         throw new Error("BAD_STATUS")

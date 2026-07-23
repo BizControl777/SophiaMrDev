@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Prisma } from "@prisma/client"
 import { db } from "@/lib/db"
 import { initiateMPesaPayment } from "@/lib/mpesa"
 import { requireAuth } from "@/lib/api-auth"
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
     // Ledger reference uses provider transaction id so retries of the same payment don't double-credit
     const ledgerRef = `recharge:${paymentResult.transactionId}`
 
-    const updatedUser = await db.$transaction(async (tx) => {
+    const updatedUser = await db.$transaction(async (tx: Prisma.TransactionClient) => {
       const { applied } = await applyBalanceOnce(tx, {
         userId,
         amount,

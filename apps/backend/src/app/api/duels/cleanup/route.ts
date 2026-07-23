@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Prisma } from "@prisma/client"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/api-auth"
 
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
 
     let count = 0
     for (const duel of expiredDuels) {
-      await db.$transaction(async (tx) => {
+      await db.$transaction(async (tx: Prisma.TransactionClient) => {
         // Devolver saldo do criador
         if (duel.betAmount > 0) {
           await tx.user.update({

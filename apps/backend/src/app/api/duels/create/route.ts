@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Prisma } from "@prisma/client"
 import { db } from "@/lib/db"
 import { groq } from "@ai-sdk/groq"
 import { generateText } from "ai"
@@ -71,7 +72,7 @@ export async function POST(req: Request) {
     }
 
     try {
-      const result = await db.$transaction(async (tx) => {
+      const result = await db.$transaction(async (tx: Prisma.TransactionClient) => {
         const duel = await tx.duel.create({
           data: {
             creatorId: userId,
