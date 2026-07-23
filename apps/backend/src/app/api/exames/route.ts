@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server"
-import type { Prisma } from "@prisma/client"
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/api-auth"
 
@@ -13,22 +12,25 @@ export async function GET(req: Request) {
     const subject = searchParams.get("subject")
     const search = searchParams.get("search")
 
-    const where: Prisma.ExamWhereInput = {}
+    // Build filter dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const conditions: any[] = []
     if (searchParams.has("isOld")) {
-      where.isOld = isOld
+      conditions.push({ isOld })
     }
-    
     if (search) {
-      where.OR = [
-        { title: { contains: search } },
-        { subject: { contains: search } }
-      ]
+      conditions.push({
+        OR: [
+          { title: { contains: search } },
+          { subject: { contains: search } }
+        ]
+      })
     } else if (subject) {
-      where.subject = { contains: subject }
+      conditions.push({ subject: { contains: subject } })
     }
 
     const exams = await db.exam.findMany({
-      where,
+      where: conditions.length > 0 ? { AND: conditions } : {},
       include: { questions: true },
       orderBy: { createdAt: "desc" }
     })
@@ -52,12 +54,10 @@ export async function GET(req: Request) {
     }))
 
     return NextResponse.json(formattedExams)
-  } catch (error: any) {
-    console.error("[EXAMS_GET] Detailed Error:", {
-      message: error.message,
-      stack: error.stack,
-      code: error.code
-    })
-    return new NextResponse(`Internal Error: ${error.message}`, { status: 500 })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error"
+    const stack = error instanceof Error ? error.stack : undefined
+    console.error("[EXAMS_GET] Detailed Error:", { message, stack })
+    return new NextResponse(`Internal Error: ${message}`, { status: 500 })
   }
 }
