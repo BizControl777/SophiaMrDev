@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     if (user) {
       studentContext = `Aluno: ${user.name}, Plano: ${user.role}, Saldo: ${user.balance} MT`
       if (user.simulations.length > 0) {
-        performanceContext = `Desempenho recente: ${user.simulations.map(s => `${s.title}: ${s.score}/${s.totalQuestions}`).join(', ')}`
+        performanceContext = `Desempenho recente: ${user.simulations.map((s: { title: string; score: number; totalQuestions: number }) => `${s.title}: ${s.score}/${s.totalQuestions}`).join(', ')}`
       }
 
       // Se não tiver chatId, busca o último ou cria um novo
