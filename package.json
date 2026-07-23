@@ -6,11 +6,12 @@
     "packages/*"
   ],
   "scripts": {
-    "backend:dev": "pnpm --filter apps/backend dev",
+    "backend:dev": "pnpm --filter @sophia/backend dev",
     "mobile:dev": "pnpm --filter apps/mobile start",
     "mobile:web": "pnpm --filter apps/mobile web",
-    "shared:build": "pnpm --filter packages/shared build",
-    "build": "pnpm run shared:build && pnpm --filter apps/backend build",
+    "shared:build": "pnpm --filter @sophia/shared build",
+    "build": "pnpm run shared:build && pnpm --filter @sophia/backend build",
+    "start": "pnpm --filter @sophia/backend start",
     "vercel-build": "pnpm install --no-frozen-lockfile && pnpm run build"
   },
   "dependencies": {
