@@ -12,25 +12,17 @@ export async function GET(req: Request) {
     const subject = searchParams.get("subject")
     const search = searchParams.get("search")
 
-    // Build filter dynamically
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const conditions: any[] = []
-    if (searchParams.has("isOld")) {
-      conditions.push({ isOld })
-    }
-    if (search) {
-      conditions.push({
-        OR: [
-          { title: { contains: search } },
-          { subject: { contains: search } }
-        ]
-      })
-    } else if (subject) {
-      conditions.push({ subject: { contains: subject } })
+    const where = {
+      ...(searchParams.has("isOld") ? { isOld } : {}),
+      ...(search
+        ? { OR: [{ title: { contains: search } }, { subject: { contains: search } }] }
+        : subject
+          ? { subject: { contains: subject } }
+          : {})
     }
 
     const exams = await db.exam.findMany({
-      where: conditions.length > 0 ? { AND: conditions } : {},
+      where,
       include: { questions: true },
       orderBy: { createdAt: "desc" }
     })
