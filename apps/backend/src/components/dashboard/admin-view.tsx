@@ -1,6 +1,7 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, ShieldCheck, Activity, Database, LayoutDashboard, UserCog } from "lucide-react"
-import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminUserManagement } from "./admin-user-management"
 

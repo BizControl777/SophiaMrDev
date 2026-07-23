@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Swords, Trophy, Timer, Zap, CheckCircle2, XCircle, Loader2 } from "lucide-react"
+import { authFetch } from "@/lib/auth-fetch"
 
 interface Question {
   id: number

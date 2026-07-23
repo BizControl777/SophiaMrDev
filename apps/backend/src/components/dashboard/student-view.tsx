@@ -1,3 +1,5 @@
+"use client"
+
 import { authFetch } from "@/lib/auth-fetch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TrendingUp, TrendingDown, BookOpen, Trophy, Swords, Activity, FileText, ArrowRight, Loader2 } from "lucide-react"

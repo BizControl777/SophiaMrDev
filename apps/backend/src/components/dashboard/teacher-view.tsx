@@ -1,25 +1,19 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { 
   Users, 
   BookOpen, 
   MessageSquare, 
   Star, 
-  Plus, 
   Wallet, 
-  Calendar, 
-  FileText, 
   TrendingUp,
-  Clock,
-  CheckCircle2,
   DollarSign
 } from "lucide-react"
 import { TeacherRequestsView } from "./teacher-requests"
-import { ManualLessonCreator } from "./manual-lesson-creator"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 
 export function TeacherDashboard({ name }: { name: string }) {
   return (

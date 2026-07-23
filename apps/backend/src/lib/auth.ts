@@ -83,5 +83,5 @@ export async function verifyAuthToken(token: string): Promise<AuthTokenPayload |
 
 export function stripPassword<T extends { password?: string }>(user: T): Omit<T, "password"> {
   const { password: _, ...rest } = user
-  return rest
+  return rest as Omit<T, "password">
 }

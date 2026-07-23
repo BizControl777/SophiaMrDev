@@ -32,7 +32,7 @@ export function sanitizeDuelForClient<T extends { questions: string; status: str
   return {
     ...duel,
     questions: JSON.stringify(stripQuestionAnswers(duel.questions)),
-  }
+  } as T
 }
 
 function scoreAnswers(questions: DuelQuestion[], answers: number[]): number | null {
