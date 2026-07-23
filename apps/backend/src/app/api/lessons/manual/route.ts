@@ -17,7 +17,8 @@ export async function GET(req: Request) {
     })
 
     // Format for frontend
-    const formattedLessons = lessons.map(lesson => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedLessons = lessons.map((lesson: any) => ({
       id: lesson.id,
       title: lesson.title,
       subject: lesson.subject,
