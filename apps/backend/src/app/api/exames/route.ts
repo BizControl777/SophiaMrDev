@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Prisma } from "@prisma/client"
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/api-auth"
 
@@ -12,7 +13,7 @@ export async function GET(req: Request) {
     const subject = searchParams.get("subject")
     const search = searchParams.get("search")
 
-    const where: any = {}
+    const where: Prisma.ExamWhereInput = {}
     if (searchParams.has("isOld")) {
       where.isOld = isOld
     }
@@ -32,7 +33,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: "desc" }
     })
 
-    const formattedExams = exams.map((exam: (typeof exams)[number]) => ({
+    const formattedExams = exams.map(exam => ({
       ...exam,
       questions: exam.questions.map(q => {
         try {
