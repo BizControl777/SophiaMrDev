@@ -27,9 +27,25 @@ export async function GET(req: Request) {
       orderBy: { createdAt: "desc" }
     })
 
-    const formattedExams = exams.map(exam => ({
+    interface QuestionRow {
+      id: string
+      examId: string | null
+      text: string
+      options: string
+      correctAnswer: number
+      explanation: string | null
+      subject: string
+      topic: string | null
+      difficulty: string
+      university: string
+      year: number
+      createdAt: Date
+      updatedAt: Date
+    }
+
+    const formattedExams = exams.map((exam: { questions: QuestionRow[] } & Record<string, unknown>) => ({
       ...exam,
-      questions: exam.questions.map(q => {
+      questions: exam.questions.map((q: QuestionRow) => {
         try {
           return {
             ...q,
