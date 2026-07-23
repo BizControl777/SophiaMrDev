@@ -37,14 +37,14 @@ function canTransition(
 }
 
 function sanitizeLesson<T extends Record<string, unknown>>(lesson: T): T {
-  const out = { ...lesson }
+  const out: Record<string, unknown> = { ...lesson }
   if (out.student && typeof out.student === "object" && out.student !== null) {
     out.student = stripPassword(out.student as { password?: string })
   }
   if (out.teacher && typeof out.teacher === "object" && out.teacher !== null) {
     out.teacher = stripPassword(out.teacher as { password?: string })
   }
-  return out
+  return out as T
 }
 
 export async function POST(req: Request) {
@@ -171,7 +171,7 @@ export async function GET(req: Request) {
       }))
     }
 
-    return NextResponse.json(lessons.map((l: any) => sanitizeLesson(l as Record<string, unknown>)))
+    return NextResponse.json(lessons.map((l: any) => sanitizeLesson(l)))
   } catch (error) {
     console.error("[LESSONS_GET]", error)
     return new NextResponse("Internal Error", { status: 500 })
