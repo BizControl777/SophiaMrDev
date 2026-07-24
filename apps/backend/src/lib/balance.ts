@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import type { Prisma } from "@prisma/client"
 
 type Tx = Prisma.TransactionClient
 
@@ -10,7 +10,12 @@ export class InsufficientBalanceError extends Error {
 }
 
 function isUniqueViolation(error: unknown): boolean {
-  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code: unknown }).code === "P2002"
+  )
 }
 
 /** Credit (or debit if amount negative). No-op if `reference` already exists. */
