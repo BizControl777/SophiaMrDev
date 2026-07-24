@@ -29,9 +29,12 @@ function canTransition(
       (actor === "student" || actor === "teacher" || actor === "admin")
     )
   }
-  // Payout only after student (or admin) confirms completion — not teacher alone
+  // Student, teacher, or admin can confirm completion and release payout
   if (to === "COMPLETED") {
-    return from === "ACCEPTED" && (actor === "student" || actor === "admin")
+    return (
+      from === "ACCEPTED" &&
+      (actor === "student" || actor === "teacher" || actor === "admin")
+    )
   }
   return false
 }

@@ -136,13 +136,14 @@ export function LiveVideoRoom({ lessonId, roomName, teacherName, subject, price,
             </div>
           )}
           
-          {role === 'STUDENT' && !isFinished && (
+          {!isFinished && onComplete && (
             <Button 
               size="sm" 
               className="h-9 bg-accent hover:bg-accent/90 font-bold text-xs gap-2 px-4 shadow-lg shadow-accent/20"
               onClick={handleCompleteLesson}
             >
-              <CheckCircle2 className="h-4 w-4" /> Finalizar & Pagar
+              <CheckCircle2 className="h-4 w-4" />
+              {role === 'STUDENT' ? 'Finalizar & Pagar' : 'Finalizar Aula'}
             </Button>
           )}
 

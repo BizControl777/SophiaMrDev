@@ -106,7 +106,7 @@ export function TeacherRequestsView() {
     setActiveUploadType(null)
   }
 
-  const handleAction = async (id: string, action: 'ACCEPTED' | 'REJECTED') => {
+  const handleAction = async (id: string, action: 'ACCEPTED' | 'REJECTED' | 'COMPLETED') => {
     if (action === 'ACCEPTED') {
       const req = requests.find(r => r.id === id)
       setAcceptingLesson(req)
@@ -114,7 +114,11 @@ export function TeacherRequestsView() {
       return
     }
 
-    if (!confirm("Deseja realmente rejeitar esta solicitação?")) return
+    const confirmMessage =
+      action === 'COMPLETED'
+        ? "Deseja realmente finalizar esta aula?"
+        : "Deseja realmente rejeitar esta solicitação?"
+    if (!confirm(confirmMessage)) return
 
     try {
       const response = await authFetch("/api/lessons", {
@@ -129,6 +133,7 @@ export function TeacherRequestsView() {
       if (response.ok) {
         await fetchRequests()
         await refreshUser()
+        if (action === 'COMPLETED') setActiveLesson(null)
       }
     } catch (error) {
       console.error("Error updating request:", error)
