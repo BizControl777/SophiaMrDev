@@ -3,7 +3,7 @@
 process.env.DATABASE_URL =
   'postgresql://postgres.mvbhzasfxxtkelmrimwk:!!elvatech777@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true';
 
-const { PrismaClient } = require('./src/generated/prisma');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const SQL_STATEMENTS = [
